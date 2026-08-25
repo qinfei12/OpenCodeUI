@@ -866,7 +866,6 @@ export const ChatPane = memo(function ChatPane({
               modelsLoading={modelsLoading}
               selectedModelKey={selectedModelKey}
               onModelChange={handleModelChange}
-              onOpenSidebar={onOpenSidebar}
               onToggleRightPanel={onToggleRightPanel}
               onSplitPane={onSplitPane}
               isPaneFullscreen={isPaneFullscreen}

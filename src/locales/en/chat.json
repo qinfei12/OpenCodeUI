@@ -8,6 +8,8 @@
     "shareSession": "Share session",
     "closeBottomPanel": "Close bottom panel",
     "openBottomPanel": "Open bottom panel",
+    "closeToolbox": "Close toolbox",
+    "openToolbox": "Open toolbox",
     "closePanel": "Close panel",
     "openPanel": "Open panel"
   },

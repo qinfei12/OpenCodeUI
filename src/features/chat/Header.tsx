@@ -2,9 +2,8 @@ import { useState, useRef, useEffect } from 'react'
 import { useTranslation } from 'react-i18next'
 import {
   PanelRightIcon,
-  PanelBottomIcon,
-  ChevronDownIcon,
-  SidebarIcon,
+  WrenchIcon,
+  ShareIcon,
   SplitHorizontalIcon,
   MaximizeIcon,
   MinimizeIcon,
@@ -27,7 +26,6 @@ interface HeaderProps {
   modelsLoading: boolean
   selectedModelKey: string | null
   onModelChange: (modelKey: string, model: ModelInfo) => void
-  onOpenSidebar?: () => void
   onToggleRightPanel?: () => void
   onSplitPane?: () => void
   isPaneFullscreen?: boolean
@@ -106,7 +104,7 @@ function SessionTitleControl({
         <>
           <div className={dividerClass} />
           <button type="button" className={shareButtonClass} title={shareTitle} aria-label={shareTitle} onClick={onShare}>
-            <ChevronDownIcon size={12} />
+            <ShareIcon size={13} />
           </button>
         </>
       )}
@@ -119,7 +117,6 @@ export function Header({
   modelsLoading,
   selectedModelKey,
   onModelChange,
-  onOpenSidebar,
   onToggleRightPanel,
   onSplitPane,
   isPaneFullscreen = false,
@@ -214,15 +211,7 @@ export function Header({
             <HomeIcon size={16} />
           </IconButton>
         )}
-        {interaction.sidebarBehavior === 'overlay' && onOpenSidebar && (
-          <IconButton
-            aria-label={t('header.openSidebar')}
-            onClick={onOpenSidebar}
-            className="hover:bg-bg-200/50 text-text-300 hover:text-text-100"
-          >
-            <SidebarIcon size={16} />
-          </IconButton>
-        )}
+        {/* 移动端（overlay）侧边栏由边缘手势唤起，不放按钮 */}
 
         {!isCompact && (
           <ModelSelector
@@ -266,20 +255,22 @@ export function Header({
           )}
 
           <IconButton
-            aria-label={bottomPanelOpen ? t('header.closeBottomPanel') : t('header.openBottomPanel')}
+            aria-label={bottomPanelOpen ? t('header.closeToolbox') : t('header.openToolbox')}
             onClick={() => layoutStore.toggleBottomPanel()}
             className={`transition-colors ${bottomPanelOpen ? 'text-accent-main-100 bg-bg-200/50' : 'text-text-300 hover:text-text-100 hover:bg-bg-200/50'}`}
           >
-            <PanelBottomIcon size={16} />
+            <WrenchIcon size={16} />
           </IconButton>
 
-          <IconButton
-            aria-label={rightPanelOpen ? t('header.closePanel') : t('header.openPanel')}
-            onClick={onToggleRightPanel ?? (() => layoutStore.toggleRightPanel())}
-            className={`transition-colors ${rightPanelOpen ? 'text-accent-main-100 bg-bg-200/50' : 'text-text-300 hover:text-text-100 hover:bg-bg-200/50'}`}
-          >
-            <PanelRightIcon size={16} />
-          </IconButton>
+          {interaction.sidebarBehavior !== 'overlay' && (
+            <IconButton
+              aria-label={rightPanelOpen ? t('header.closePanel') : t('header.openPanel')}
+              onClick={onToggleRightPanel ?? (() => layoutStore.toggleRightPanel())}
+              className={`transition-colors ${rightPanelOpen ? 'text-accent-main-100 bg-bg-200/50' : 'text-text-300 hover:text-text-100 hover:bg-bg-200/50'}`}
+            >
+              <PanelRightIcon size={16} />
+            </IconButton>
+          )}
         </div>
       </div>
 
