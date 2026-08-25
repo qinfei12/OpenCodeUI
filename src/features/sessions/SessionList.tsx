@@ -645,7 +645,7 @@ export function SessionListItem({
         onTouchStart={!isEditMode ? handleTouchStart : undefined}
         onTouchMove={!isEditMode ? handleTouchMove : undefined}
         onTouchEnd={!isEditMode ? handleTouchEnd : undefined}
-        className={`group relative flex items-center gap-2 px-2 py-1.5 cursor-default transition-colors duration-150 select-none ${getSelectionRoundClass(
+        className={`group relative flex items-center gap-2 px-2 py-1.5 cursor-default transition-colors duration-150 select-none border ${getSelectionRoundClass(
           isEditMode && isChecked,
           checkedPrev,
           checkedNext,
@@ -653,11 +653,11 @@ export function SessionListItem({
         )} ${
           isEditMode
             ? isChecked
-              ? 'bg-bg-200/80 text-text-100'
-              : 'text-text-300 hover:bg-bg-200/40 hover:text-text-200'
+              ? 'border-transparent bg-bg-200/80 text-text-100'
+              : 'border-transparent text-text-300 hover:bg-bg-200/40 hover:text-text-200'
             : isSelected
-              ? 'bg-bg-200/80 text-text-100'
-              : 'text-text-300 hover:bg-bg-200/40 hover:text-text-200'
+              ? 'mb-0.5 bg-accent-main-100/10 border-accent-main-100/60 text-text-100 shadow-sm'
+              : 'mb-0.5 border-border-300/25 text-text-300 hover:border-border-300/50 hover:bg-bg-200/40 hover:text-text-200'
         } ${showActions && !isEditMode ? 'bg-bg-200/40' : ''}`}
       >
         <span className="relative shrink-0 flex items-center justify-center size-5" title={statusIndicatorTitle}>
@@ -775,19 +775,17 @@ export function SessionListItem({
       onTouchStart={!isEditMode ? handleTouchStart : undefined}
       onTouchMove={!isEditMode ? handleTouchMove : undefined}
       onTouchEnd={!isEditMode ? handleTouchEnd : undefined}
-      className={`group relative flex items-start ${itemPaddingClass} cursor-default transition-all duration-200 border border-transparent select-none ${getSelectionRoundClass(
+      className={`group relative flex items-start ${itemPaddingClass} cursor-default transition-all duration-200 border select-none ${getSelectionRoundClass(
         isEditMode && isChecked,
         checkedPrev,
         checkedNext,
         'lg',
       )} ${
         isEditMode
-          ? isChecked
-            ? 'bg-bg-200/80'
-            : 'hover:bg-bg-200/50'
+          ? `border-transparent ${isChecked ? 'bg-bg-200/80' : 'hover:bg-bg-200/50'}`
           : isSelected
-            ? 'bg-bg-000 shadow-sm ring-1 ring-border-200/50'
-            : 'hover:bg-bg-200/50'
+            ? 'border-accent-main-100/60 bg-accent-main-100/10 shadow-sm'
+            : 'border-border-300/25 hover:border-border-300/50 hover:bg-bg-200/50'
       } ${showActions && !isEditMode ? 'bg-bg-200/50' : ''}`}
     >
       <button
