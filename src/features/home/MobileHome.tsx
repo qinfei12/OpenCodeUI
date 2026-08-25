@@ -19,9 +19,28 @@ interface MobileHomeProps {
 
 type HomeTab = 'work' | 'code'
 
+const LAST_TAB_STORAGE_KEY = 'mobile-home.last-tab'
+
+function loadLastTab(): HomeTab {
+  try {
+    return sessionStorage.getItem(LAST_TAB_STORAGE_KEY) === 'code' ? 'code' : 'work'
+  } catch {
+    return 'work'
+  }
+}
+
 export function MobileHome({ serverId, children, onStartCoding }: MobileHomeProps) {
   const { t } = useTranslation(['chat'])
-  const [activeTab, setActiveTab] = useState<HomeTab>('work')
+  const [activeTab, setActiveTab] = useState<HomeTab>(loadLastTab)
+
+  const switchTab = (tab: HomeTab) => {
+    setActiveTab(tab)
+    try {
+      sessionStorage.setItem(LAST_TAB_STORAGE_KEY, tab)
+    } catch {
+      // sessionStorage 不可用时忽略，仅影响下次进入的默认 Tab
+    }
+  }
 
   const tabs: { id: HomeTab; label: string; icon: ReactNode }[] = [
     { id: 'work', label: t('mobileHome.tab.work'), icon: <MessageSquareIcon className="h-4 w-4" /> },
@@ -41,7 +60,7 @@ export function MobileHome({ serverId, children, onStartCoding }: MobileHomeProp
                 type="button"
                 role="tab"
                 aria-selected={active}
-                onClick={() => setActiveTab(tab.id)}
+                onClick={() => switchTab(tab.id)}
                 className={`flex items-center gap-1.5 rounded-lg px-5 py-1.5 text-[length:var(--fs-md)] font-medium transition-colors ${
                   active ? 'bg-bg-100 text-text-100 shadow-sm' : 'text-text-400 active:text-text-200'
                 }`}

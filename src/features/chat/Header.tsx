@@ -8,6 +8,7 @@ import {
   SplitHorizontalIcon,
   MaximizeIcon,
   MinimizeIcon,
+  HomeIcon,
 } from '../../components/Icons'
 import { IconButton } from '../../components/ui'
 import { ModelSelector, type ModelSelectorHandle } from './ModelSelector'
@@ -32,6 +33,8 @@ interface HeaderProps {
   isPaneFullscreen?: boolean
   onTogglePaneFullscreen?: () => void
   modelSelectorRef?: React.RefObject<ModelSelectorHandle | null>
+  /** 返回移动端 Work/Code 双 Tab 主页（仅移动端传入） */
+  onOpenHome?: () => void
 }
 
 interface SessionTitleControlProps {
@@ -122,6 +125,7 @@ export function Header({
   isPaneFullscreen = false,
   onTogglePaneFullscreen,
   modelSelectorRef,
+  onOpenHome,
 }: HeaderProps) {
   const { t } = useTranslation('chat')
   const { sessionId, sessionDirectory, sessionTitle: currentSessionTitle } = useHeaderSessionMeta()
@@ -200,6 +204,16 @@ export function Header({
       className={`mobile-safe-topbar-14 flex justify-between items-center z-20 bg-bg-100 transition-colors duration-200 relative ${isCompact ? 'px-2' : 'px-4'}`}
     >
       <div className="flex items-center gap-2 min-w-0 shrink-1 z-20">
+        {interaction.sidebarBehavior === 'overlay' && onOpenHome && (
+          <IconButton
+            aria-label={t('header.openHome')}
+            title={t('header.openHome')}
+            onClick={onOpenHome}
+            className="hover:bg-bg-200/50 text-text-300 hover:text-text-100"
+          >
+            <HomeIcon size={16} />
+          </IconButton>
+        )}
         {interaction.sidebarBehavior === 'overlay' && onOpenSidebar && (
           <IconButton
             aria-label={t('header.openSidebar')}

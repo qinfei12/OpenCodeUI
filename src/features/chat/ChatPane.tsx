@@ -872,6 +872,7 @@ export const ChatPane = memo(function ChatPane({
               isPaneFullscreen={isPaneFullscreen}
               onTogglePaneFullscreen={onTogglePaneFullscreen}
               modelSelectorRef={modelSelectorRef}
+              onOpenHome={isMobileViewport ? navigateHome : undefined}
             />
           </div>
         </div>

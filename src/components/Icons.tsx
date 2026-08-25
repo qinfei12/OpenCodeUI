@@ -9,6 +9,7 @@ import {
   ChevronLeft,
   ChevronRight,
   SquarePen,
+  House,
   Hand,
   Keyboard,
   Check,
@@ -118,6 +119,7 @@ export const ChevronUpIcon = wrap(ChevronUp)
 export const ChevronLeftIcon = wrap(ChevronLeft)
 export const ChevronRightIcon = wrap(ChevronRight)
 export const NewChatIcon = wrap(SquarePen)
+export const HomeIcon = wrap(House)
 export const HandIcon = wrap(Hand)
 export const KeyboardIcon = wrap(Keyboard)
 export const CheckIcon = wrap(Check)
