@@ -656,8 +656,8 @@ export function SessionListItem({
               ? 'border-transparent bg-bg-200/80 text-text-100'
               : 'border-transparent text-text-300 hover:bg-bg-200/40 hover:text-text-200'
             : isSelected
-              ? 'mb-0.5 bg-accent-main-100/10 border-accent-main-100/60 text-text-100 shadow-sm'
-              : 'mb-0.5 border-border-300/25 text-text-300 hover:border-border-300/50 hover:bg-bg-200/40 hover:text-text-200'
+              ? 'mb-0.5 bg-accent-main-100/15 border-accent-main-100/80 text-text-100 shadow-sm'
+              : 'mb-0.5 border-border-300/40 text-text-300 hover:border-border-300/70 hover:bg-bg-200/40 hover:text-text-200'
         } ${showActions && !isEditMode ? 'bg-bg-200/40' : ''}`}
       >
         <span className="relative shrink-0 flex items-center justify-center size-5" title={statusIndicatorTitle}>
@@ -784,8 +784,8 @@ export function SessionListItem({
         isEditMode
           ? `border-transparent ${isChecked ? 'bg-bg-200/80' : 'hover:bg-bg-200/50'}`
           : isSelected
-            ? 'border-accent-main-100/60 bg-accent-main-100/10 shadow-sm'
-            : 'border-border-300/25 hover:border-border-300/50 hover:bg-bg-200/50'
+            ? 'border-accent-main-100/80 bg-accent-main-100/15 shadow-sm'
+            : 'border-border-300/40 hover:border-border-300/70 hover:bg-bg-200/50'
       } ${showActions && !isEditMode ? 'bg-bg-200/50' : ''}`}
     >
       <button

@@ -73,8 +73,8 @@ export function MobileHome({ serverId, children, onStartCoding }: MobileHomeProp
         </div>
       </div>
 
-      {/* Tab 内容 */}
-      <div role="tabpanel" className="min-h-0 flex-1">
+      {/* Tab 内容 — flex-col 让 chatContent（flex-1 + absolute 子元素）正确撑满高度 */}
+      <div role="tabpanel" className="min-h-0 flex-1 flex flex-col">
         {activeTab === 'work' ? (
           children
         ) : (

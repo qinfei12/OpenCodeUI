@@ -65,8 +65,8 @@ export function ActiveSessionItem({ entry, resolvedSession, isSelected, onSelect
       onClick={handleClick}
       className={`group relative flex items-start pl-[6px] pr-3 py-2 rounded-lg cursor-default select-none transition-all duration-200 border ${
         isSelected
-          ? 'bg-accent-main-100/10 border-accent-main-100/60 shadow-sm'
-          : 'border-border-300/25 hover:border-border-300/50 hover:bg-bg-200/50'
+          ? 'bg-accent-main-100/15 border-accent-main-100/80 shadow-sm'
+          : 'border-border-300/40 hover:border-border-300/70 hover:bg-bg-200/50'
       } ${!resolvedSession ? 'opacity-50 cursor-default' : ''}`}
     >
       {/* Content */}
