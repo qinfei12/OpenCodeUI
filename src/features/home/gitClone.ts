@@ -2,20 +2,23 @@
 // Code Tab - GitHub 仓库克隆到固定工作区
 //
 // opencode 后端没有 git 操作端点，通过一次性 PTY
-// 执行 shell 脚本完成 clone/fetch/switch，退出码
-// 通过状态文件 + file.read 读回。
+// 执行 shell 脚本完成 clone/fetch/switch；脚本在退出前
+// 输出 `__OPENCODEUI_EXIT__:<code>` 哨兵，前端通过 PTY
+// WebSocket 收集输出、连接关闭后解析退出码。
 // ============================================
 
-import { createPtySession, getPtySession, removePtySession } from '../../api/pty'
-import { getFileContent } from '../../api/file'
+import { createPtySession, removePtySession } from '../../api/pty'
+import { getPtyConnectUrl } from '../../api/pty'
 import { getPath } from '../../api/client'
+import { connectTauriPty, type TauriPtyConnection } from '../../api/ptyBridge'
+import { parsePtyFrame } from '../../utils/ptyProtocol'
+import { isTauri } from '../../utils/tauri'
 
 const EXIT_SENTINEL = '__OPENCODEUI_EXIT__'
 export const PROJECTS_ROOT_NAME = 'OpenCodeUI-Projects'
 
 const CLONE_TIMEOUT_MS = 10 * 60 * 1000
 const COMMAND_TIMEOUT_MS = 60 * 1000
-const POLL_INTERVAL_MS = 800
 
 function trimTrailingSlash(path: string): string {
   return path.replace(/\/+$/, '')
@@ -50,16 +53,36 @@ interface ScriptResult {
 /**
  * 在服务器上执行一段 POSIX shell 片段，返回退出码与合并输出。
  *
- * 实现：脚本输出重定向到状态文件，PTY 进程退出后用 file.read 读回，
- * 最后一行 `__OPENCODEUI_EXIT__:<code>` 为退出码哨兵。
+ * 实现：PTY 进程退出时服务器会关闭 WebSocket 连接，收集期间的全部输出，
+ * 从中解析最后一个 `__OPENCODEUI_EXIT__:<code>` 哨兵行得到退出码。
  */
-async function runShellScript(
+export async function runShellScript(
+  script: string,
+  opts: { cwd: string; serverId?: string; timeoutMs: number },
+): Promise<ScriptResult> {
+  try {
+    return await runShellScriptOnce(script, opts)
+  } catch (error) {
+    // 极快结束的命令可能在 WS 连接建立前就执行完毕并被服务器清理，
+    // 输出随之丢失。仅对无副作用的探测命令自动重试一次。
+    if (
+      script.trimStart().startsWith('test ') &&
+      error instanceof Error &&
+      error.message === 'pty-output-missing-exit-code'
+    ) {
+      return runShellScriptOnce(script, opts)
+    }
+    throw error
+  }
+}
+
+async function runShellScriptOnce(
   script: string,
   opts: { cwd: string; serverId?: string; timeoutMs: number },
 ): Promise<ScriptResult> {
   const { cwd, serverId, timeoutMs } = opts
-  const statusFile = `${trimTrailingSlash(cwd)}/.opencodeui-cmd-${Date.now()}.log`
-  const wrapped = `{ ${script}\necho "${EXIT_SENTINEL}:$?" ; } > '${statusFile}' 2>&1`
+  // GIT_TERMINAL_PROMPT=0 防止凭据失效时 git 卡在交互提示上
+  const wrapped = `{ export GIT_TERMINAL_PROMPT=0 GIT_ASKPASS=/bin/true\n${script}\necho "${EXIT_SENTINEL}:$?" ; } 2>&1`
 
   const pty = await createPtySession(
     { command: 'sh', args: ['-c', wrapped], cwd, title: 'OpenCodeUI git' },
@@ -67,35 +90,82 @@ async function runShellScript(
     serverId,
   )
 
-  try {
-    const deadline = Date.now() + timeoutMs
-    for (;;) {
-      await new Promise(resolve => setTimeout(resolve, POLL_INTERVAL_MS))
-      if (Date.now() > deadline) {
-        throw new Error('git-command-timeout')
+  return await new Promise<ScriptResult>((resolve, reject) => {
+    let output = ''
+    let settled = false
+    let ws: WebSocket | null = null
+    let bridge: TauriPtyConnection | null = null
+    const timer = setTimeout(() => settle(new Error('git-command-timeout')), timeoutMs)
+
+    function settle(error?: Error) {
+      if (settled) return
+      settled = true
+      clearTimeout(timer)
+      ws?.close()
+      bridge?.close()
+      // 状态 PTY 无保留价值，成功失败都清理
+      removePtySession(pty.id, undefined, serverId).catch(() => {})
+
+      if (error) {
+        reject(error)
+        return
       }
-      const current = await getPtySession(pty.id, undefined, serverId)
-      if (current.status === 'exited') break
+
+      const normalized = output.replace(/\r/g, '')
+      const matches = [...normalized.matchAll(new RegExp(`${EXIT_SENTINEL}:(\\d+)`, 'g'))]
+      const last = matches.at(-1)
+      if (!last) {
+        reject(new Error('pty-output-missing-exit-code'))
+        return
+      }
+      const sentinelIndex = normalized.lastIndexOf(last[0])
+      const logOutput = (normalized.slice(0, sentinelIndex) + normalized.slice(sentinelIndex + last[0].length))
+        .trim()
+        .slice(-4000)
+      resolve({ exitCode: Number(last[1]), output: logOutput })
     }
 
-    const fileContent = await getFileContent(statusFile, undefined, serverId)
-    const content = typeof fileContent?.content === 'string' ? fileContent.content : ''
-    const lines = content.split('\n')
-    let exitCode = -1
-    while (lines.length > 0) {
-      const line = lines.pop()?.trim()
-      if (!line) continue
-      const match = line.match(new RegExp(`^${EXIT_SENTINEL}:(\\d+)$`))
-      if (match) {
-        exitCode = Number(match[1])
-      }
-      break
+    const handleChunk = (chunk: string | ArrayBuffer) => {
+      const frame = parsePtyFrame(chunk)
+      if (frame?.kind === 'data') output += frame.data
     }
-    return { exitCode, output: content.slice(0, 4000) }
-  } finally {
-    // 状态 PTY 无保留价值，失败/成功都清理
-    removePtySession(pty.id, undefined, serverId).catch(() => {})
-  }
+
+    if (isTauri()) {
+      void connectTauriPty({
+        ptyId: pty.id,
+        serverId,
+        onConnected: () => {},
+        onMessage: handleChunk,
+        onDisconnected: () => settle(),
+        onError: message => settle(new Error(message)),
+      }).then(
+        connection => {
+          if (settled) {
+            connection.close()
+            return
+          }
+          bridge = connection
+        },
+        error => {
+          settle(error instanceof Error ? error : new Error(String(error)))
+        },
+      )
+      return
+    }
+
+    try {
+      ws = new WebSocket(getPtyConnectUrl(pty.id, undefined, {}, serverId))
+    } catch (error) {
+      settle(error instanceof Error ? error : new Error(String(error)))
+      return
+    }
+    ws.binaryType = 'arraybuffer'
+    ws.onmessage = event => handleChunk(event.data as string | ArrayBuffer)
+    ws.onclose = () => settle()
+    ws.onerror = () => {
+      // onclose 随后会触发并在无哨兵时报连接错误，这里不重复处理
+    }
+  })
 }
 
 export type PrepareRepoStatus = 'created' | 'switched' | 'ready'

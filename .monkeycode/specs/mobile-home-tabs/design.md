@@ -42,7 +42,7 @@ graph TD
 
 1. **渲染注入点**: `MobileHome` 作为 ChatPane 在 `displayMode === 'single'`、`sessionId === null`、且移动端视口时的包裹外壳。Work Tab 直接渲染 `chatContent`（现有 home 状态），Code Tab 渲染 `GitHubProjectBrowser`。这避免改动 App 布局与 pager 结构，克隆后返回首页时依然走原 `navigatePaneHome` 逻辑。
 2. **GitHub 鉴权**: Token 由用户在 Code Tab 内输入，持久化到 `localStorage`（key: `github.token`）。前端直接调用 GitHub REST API（`api.github.com`），token 仅存在于浏览器本地，不发送到 opencode 服务器。
-3. **git 操作**: opencode 后端无 git clone/branch 端点（已核对 `openapi_doc.json`），因此通过 `createPtySession` 创建一次性 PTY 会话执行 shell 命令（`git clone` / `git switch` / `git -C <dir> ls-remote` 等），通过 PTY 状态轮询判断完成。
+3. **git 操作**: opencode 后端无 git clone/branch 端点（已核对 `openapi_doc.json`），因此通过 `createPtySession` 创建一次性 PTY 会话执行 shell 命令（`git clone` / `git switch` / `git -C <dir> ls-remote` 等），通过 PTY WebSocket 输出中的退出码哨兵判定完成。
 4. **进入编程会话**: 克隆完成后调用 `createSession({ directory })`（`src/api/session.ts`），再通过 `useRouter().navigateToSession` 写入 `#/session/{serverId}::{sessionId}?dir={path}`，ChatPane 按路由加载该 session。
 
 ## Components and Interfaces
@@ -119,7 +119,8 @@ export async function cloneRepo(
 
 - 克隆命令：`git clone --branch {branch} --depth 1 {repoUrl} {worktree}`（本地不存在时）。
 - 已存在 + 重选分支：`git -C {worktree} fetch origin --depth 1 {branch} && git -C {worktree} switch --force {branch}`。
-- 通过 `createPtySession({ command, args, cwd })`（`src/api/pty.ts`）执行，轮询 `getPtySession` 直到 `status === 'exited'`，按 exit code 判定成败。
+- 通过 `createPtySession({ command, args, cwd })`（`src/api/pty.ts`）执行，随后立即连接 PTY WebSocket 收集全部输出；进程退出时服务器关闭连接，前端从输出中解析末尾的 `__OPENCODEUI_EXIT__:<code>` 哨兵行得到退出码。
+- 已知限制：该版本服务器在 PTY 进程退出后立即销毁会话记录，状态轮询与 `/file` 读端点均不可用；毫秒级探测命令可能在 WS 建立前执行完毕导致输出丢失，`runShellScript` 对 `test ` 开头的无副作用命令自动重试一次。
 
 ### ChatPane 集成
 
