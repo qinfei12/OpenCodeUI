@@ -120,7 +120,9 @@ export async function cloneRepo(
 - 克隆命令：`git clone --branch {branch} --depth 1 {repoUrl} {worktree}`（本地不存在时）。
 - 已存在 + 重选分支：`git -C {worktree} fetch origin --depth 1 {branch} && git -C {worktree} switch --force {branch}`。
 - 通过 `createPtySession({ command, args, cwd })`（`src/api/pty.ts`）执行，随后立即连接 PTY WebSocket 收集全部输出；进程退出时服务器关闭连接，前端从输出中解析末尾的 `__OPENCODEUI_EXIT__:<code>` 哨兵行得到退出码。
-- 已知限制：该版本服务器在 PTY 进程退出后立即销毁会话记录，状态轮询与 `/file` 读端点均不可用；毫秒级探测命令可能在 WS 建立前执行完毕导致输出丢失，`runShellScript` 对 `test ` 开头的无副作用命令自动重试一次。
+- 已知限制：该版本服务器在 PTY 进程退出后立即销毁会话记录，状态轮询与 `/file` 读端点均不可用。
+- 防丢输出：脚本以 `sleep 1` 开头，保证客户端完成 WS 握手后才开始真正的命令——毫秒级失败的命令（如 token 无权限时 git 秒退）会在会话销毁时连输出一起消失。
+- 单脚本流程：探测/克隆/切换合并为一个 shell 脚本在单个 PTY 内执行，通过 `__OPENCODEUI_STATUS__:<stage>` 标记行上报阶段（ready/switching/cloning/conflict），前端实时解析用于进度展示与结果判定。分支内失败立即输出哨兵并 exit，避免 if 复合命令覆盖真实退出码。
 
 ### ChatPane 集成
 
