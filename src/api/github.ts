@@ -24,10 +24,14 @@ export interface GitHubBranch {
   commitSha: string
 }
 
-class GitHubApiError extends Error {
-  constructor(message: string) {
+export class GitHubApiError extends Error {
+  /** HTTP 状态码；network 类错误无状态码 */
+  readonly status?: number
+
+  constructor(message: string, status?: number) {
     super(message)
     this.name = 'GitHubApiError'
+    this.status = status
   }
 }
 
@@ -55,21 +59,45 @@ async function request<T>(path: string, token: string): Promise<T> {
   let response: Response
   try {
     response = await fetch(`${GITHUB_API_BASE}${path}`, { headers: authHeaders(token) })
-  } catch {
-    throw new GitHubApiError('network')
+  } catch (error) {
+    // DNS 失败、断网、扩展拦截等都会走到这里，保留原始原因
+    const reason = error instanceof Error ? error.message : String(error)
+    throw new GitHubApiError(`network-error: ${reason}`)
   }
 
   if (response.status === 401 || response.status === 403) {
-    throw new GitHubApiError('unauthorized')
+    // 401=token 无效；403 可能是权限不足或触发了速率限制
+    let apiMessage = ''
+    try {
+      const body = (await response.json()) as { message?: string }
+      if (body?.message) apiMessage = body.message
+    } catch {
+      // 响应体非 JSON 时忽略，仅保留状态码信息
+    }
+    throw new GitHubApiError(
+      `GitHub API ${response.status}${apiMessage ? `: ${apiMessage}` : ''}`,
+      response.status,
+    )
   }
+
   if (!response.ok) {
-    throw new GitHubApiError('http')
+    let apiMessage = ''
+    try {
+      const body = (await response.json()) as { message?: string }
+      if (body?.message) apiMessage = body.message
+    } catch {
+      // 响应体非 JSON 时忽略，仅保留状态码信息
+    }
+    throw new GitHubApiError(
+      `GitHub API ${response.status}${apiMessage ? `: ${apiMessage}` : ''}`,
+      response.status,
+    )
   }
 
   try {
     return (await response.json()) as T
   } catch {
-    throw new GitHubApiError('invalid-response')
+    throw new GitHubApiError('invalid-response: response body is not valid JSON')
   }
 }
 

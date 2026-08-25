@@ -18,6 +18,7 @@ import {
   fetchUserRepos,
   getGitHubToken,
   setGitHubToken,
+  GitHubApiError,
   type GitHubBranch,
   type GitHubRepo,
 } from '../../api/github'
@@ -38,7 +39,13 @@ const PROGRESS_KEYS: Record<PrepareRepoStatus | string, string> = {
 }
 
 function isUnauthorized(error: unknown): boolean {
-  return error instanceof Error && (error.message === 'unauthorized' || error.message === 'forbidden')
+  return error instanceof GitHubApiError && (error.status === 401 || error.status === 403)
+}
+
+/** 提取错误的可展示详情：优先 message，兜底 String */
+function errorDetail(error: unknown): string {
+  if (error instanceof Error) return error.message
+  return String(error)
 }
 
 export function GitHubProjectBrowser({ serverId, onStartCoding }: GitHubProjectBrowserProps) {
@@ -48,10 +55,12 @@ export function GitHubProjectBrowser({ serverId, onStartCoding }: GitHubProjectB
   const [repos, setRepos] = useState<GitHubRepo[]>([])
   const [isLoadingRepos, setIsLoadingRepos] = useState(false)
   const [repoError, setRepoError] = useState<string | null>(null)
+  const [repoErrorDetail, setRepoErrorDetail] = useState<string | null>(null)
   const [selectedRepo, setSelectedRepo] = useState<GitHubRepo | null>(null)
   const [branches, setBranches] = useState<GitHubBranch[]>([])
   const [isLoadingBranches, setIsLoadingBranches] = useState(false)
   const [branchError, setBranchError] = useState<string | null>(null)
+  const [branchErrorDetail, setBranchErrorDetail] = useState<string | null>(null)
   const [selectedBranch, setSelectedBranch] = useState<string>('')
   const [cloneProgress, setCloneProgress] = useState<string>('mobileHome.progress.checking')
   const [readyWorktree, setReadyWorktree] = useState<string | null>(null)
@@ -70,18 +79,22 @@ export function GitHubProjectBrowser({ serverId, onStartCoding }: GitHubProjectB
     const requestId = ++reposRequestIdRef.current
     setIsLoadingRepos(true)
     setRepoError(null)
+    setRepoErrorDetail(null)
     try {
       const data = await fetchUserRepos(token)
       if (requestId !== reposRequestIdRef.current) return
       setRepos(data)
     } catch (error) {
+      console.error('[CodeTab] loadRepos failed:', error)
       if (requestId !== reposRequestIdRef.current) return
       if (isUnauthorized(error)) {
         setPhase('token')
         setRepoError('unauthorized')
+        setRepoErrorDetail(errorDetail(error))
         return
       }
-      setRepoError(error instanceof Error ? error.message : 'unknown')
+      setRepoError('load-failed')
+      setRepoErrorDetail(errorDetail(error))
     } finally {
       if (requestId === reposRequestIdRef.current) setIsLoadingRepos(false)
     }
@@ -97,6 +110,7 @@ export function GitHubProjectBrowser({ serverId, onStartCoding }: GitHubProjectB
     setGitHubToken(trimmed)
     setTokenInput('')
     setRepoError(null)
+    setRepoErrorDetail(null)
     setPhase('repos')
   }
 
@@ -108,10 +122,15 @@ export function GitHubProjectBrowser({ serverId, onStartCoding }: GitHubProjectB
     }
     setSelectedRepo(repo)
     setSelectedBranch(repo.defaultBranch)
+    setBranches([])
+    setBranchError(null)
+    setBranchErrorDetail(null)
+    setCloneError(null)
     setPhase('branches')
     const requestId = ++branchesRequestIdRef.current
     setIsLoadingBranches(true)
     setBranchError(null)
+    setBranchErrorDetail(null)
     try {
       const data = await fetchRepoBranches(token, repo.owner, repo.name)
       if (requestId !== branchesRequestIdRef.current) return
@@ -119,8 +138,10 @@ export function GitHubProjectBrowser({ serverId, onStartCoding }: GitHubProjectB
       const sorted = [...data.filter(b => b.name === repo.defaultBranch), ...data.filter(b => b.name !== repo.defaultBranch)]
       setBranches(sorted)
     } catch (error) {
+      console.error('[CodeTab] loadBranches failed:', error)
       if (requestId !== branchesRequestIdRef.current) return
-      setBranchError(error instanceof Error ? error.message : 'unknown')
+      setBranchError('load-failed')
+      setBranchErrorDetail(errorDetail(error))
     } finally {
       if (requestId === branchesRequestIdRef.current) setIsLoadingBranches(false)
     }
@@ -149,9 +170,10 @@ export function GitHubProjectBrowser({ serverId, onStartCoding }: GitHubProjectB
       })
       setReadyWorktree(result.worktree)
     } catch (error) {
+      console.error('[CodeTab] clone failed:', error)
       const message = error instanceof Error ? error.message : 'unknown'
       const detail = (error as { detail?: string }).detail
-      setCloneError({ message, detail })
+      setCloneError({ message, detail: detail || errorDetail(error) })
       setPhase('branches')
     }
   }
@@ -190,10 +212,17 @@ export function GitHubProjectBrowser({ serverId, onStartCoding }: GitHubProjectB
             <p className="text-center text-[length:var(--fs-sm)] text-text-400">{t('mobileHome.token.description')}</p>
           </div>
 
-          {repoError === 'unauthorized' && (
+          {repoError && (
             <div className="mb-4 flex items-start gap-2 rounded-lg border border-red-500/30 bg-red-500/10 px-3 py-2 text-[length:var(--fs-sm)] text-red-400">
               <AlertCircleIcon className="mt-0.5 h-4 w-4 shrink-0" />
-              <span>{t('mobileHome.error.unauthorized')}</span>
+              <div className="min-w-0 flex-1">
+                <span>{t(repoError === 'unauthorized' ? 'mobileHome.error.unauthorized' : 'mobileHome.error.loadFailed')}</span>
+                {repoErrorDetail && (
+                  <pre className="mt-1 max-h-20 overflow-y-auto custom-scrollbar whitespace-pre-wrap break-all font-mono text-[length:var(--fs-xxs)] text-red-400/70">
+                    {repoErrorDetail}
+                  </pre>
+                )}
+              </div>
             </div>
           )}
 
@@ -300,7 +329,12 @@ export function GitHubProjectBrowser({ serverId, onStartCoding }: GitHubProjectB
 
           {!isLoadingBranches && branchError && (
             <div className="py-10 text-center">
-              <p className="mb-3 text-[length:var(--fs-sm)] text-red-400">{t('mobileHome.error.loadFailed')}</p>
+              <p className="mb-1 text-[length:var(--fs-sm)] text-red-400">{t('mobileHome.error.loadFailed')}</p>
+              {branchErrorDetail && (
+                <pre className="mx-auto mb-3 max-h-20 max-w-md overflow-y-auto custom-scrollbar whitespace-pre-wrap break-all rounded-lg bg-bg-200 px-2 py-1.5 text-left font-mono text-[length:var(--fs-xxs)] text-text-500">
+                  {branchErrorDetail}
+                </pre>
+              )}
               <button
                 type="button"
                 onClick={() => void handleSelectRepo(selectedRepo)}
@@ -399,11 +433,16 @@ export function GitHubProjectBrowser({ serverId, onStartCoding }: GitHubProjectB
 
         {!isLoadingRepos && repoError && (
           <div className="py-10 text-center">
-            <p className="mb-3 text-[length:var(--fs-sm)] text-red-400">
+            <p className="mb-1 text-[length:var(--fs-sm)] text-red-400">
               {repoError === 'unauthorized'
                 ? t('mobileHome.error.unauthorized')
                 : t('mobileHome.error.loadFailed')}
             </p>
+            {repoErrorDetail && (
+              <pre className="mx-auto mb-3 max-h-20 max-w-md overflow-y-auto custom-scrollbar whitespace-pre-wrap break-all rounded-lg bg-bg-200 px-2 py-1.5 text-left font-mono text-[length:var(--fs-xxs)] text-text-500">
+                {repoErrorDetail}
+              </pre>
+            )}
             <button
               type="button"
               onClick={() => void loadRepos()}
