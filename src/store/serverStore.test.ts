@@ -78,15 +78,16 @@ describe('serverStore local runtime URL', () => {
   })
 
   it('uses the detected local service URL without persisting it as the configured URL', async () => {
+    const { API_BASE_URL } = await import('../constants/api')
     const { serverStore } = await import('./serverStore')
 
-    expect(serverStore.getActiveBaseUrl()).toBe('http://127.0.0.1:4096')
+    expect(serverStore.getActiveBaseUrl()).toBe(API_BASE_URL)
 
     expect(serverStore.setLocalServerRuntimeUrl('http://127.0.0.1:58231/')).toBe(true)
 
     expect(serverStore.getActiveBaseUrl()).toBe('http://127.0.0.1:58231')
     expect(serverStore.getLocalServerUrl()).toBe('http://127.0.0.1:58231')
-    expect(serverStore.getStoredServers().find(server => server.id === 'local')?.url).toBe('http://127.0.0.1:4096')
+    expect(serverStore.getStoredServers().find(server => server.id === 'local')?.url).toBe(API_BASE_URL)
   })
 
   it('notifies listeners when the active local runtime URL changes', async () => {

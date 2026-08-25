@@ -170,6 +170,7 @@ class ServerStore {
       const stored = localStorage.getItem(STORAGE_KEY)
       if (stored) {
         this.servers = JSON.parse(stored)
+        this.migrateLocalServerUrl()
       }
 
       // 如果没有服务器，添加默认的本地服务器
@@ -205,6 +206,19 @@ class ServerStore {
         },
       ]
       this.activeServerId = this.DEFAULT_SERVER_ID
+    }
+  }
+
+  /**
+   * 迁移：旧版本把本地服务器 URL 硬编码为 http://127.0.0.1:4096 并持久化，
+   * 跨设备访问时会指向访问者自己的机器。仅覆盖从未被用户修改过的默认值。
+   */
+  private migrateLocalServerUrl(): void {
+    const LEGACY_LOCAL_URL = 'http://127.0.0.1:4096'
+    const localServer = this.servers.find(s => s.id === this.DEFAULT_SERVER_ID)
+    if (localServer && localServer.url === LEGACY_LOCAL_URL && API_BASE_URL !== LEGACY_LOCAL_URL) {
+      localServer.url = API_BASE_URL
+      this.saveToStorage()
     }
   }
 

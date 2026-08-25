@@ -8,6 +8,7 @@ const { usesCustomDesktopTitlebarMock } = vi.hoisted(() => ({
 }))
 
 vi.mock('../utils/tauri', () => ({
+  isTauri: () => false,
   usesCustomDesktopTitlebar: usesCustomDesktopTitlebarMock,
 }))
 
