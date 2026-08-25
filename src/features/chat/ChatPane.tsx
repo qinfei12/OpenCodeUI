@@ -17,6 +17,7 @@ import { PaneDropOverlay, resolveDropZone, type DropZone, type PaneDropOverlayHa
 import { useFolderProjectDrop } from './useFolderProjectDrop'
 import { FolderProjectDropOverlay } from './FolderProjectDropOverlay'
 import { useChatSession, useModels, useModelSelection } from '../../hooks'
+import { useIsMobile } from '../../hooks/useIsMobile'
 import { useServerStore } from '../../hooks/useServerStore'
 import { useCancelHint } from '../../hooks/useCancelHint'
 import { makeSessionKey, sessionKeyToServerId } from '../../utils/sessionKey'
@@ -36,6 +37,8 @@ import type { Attachment } from '../../api'
 import type { MessageError } from '../../types/message'
 import { getInternalDragSnapshot, subscribeInternalDrag, subscribeInternalDrop } from '../../lib/internalDragCore'
 import { ErrorBoundary } from '../../components/ErrorBoundary'
+import { MobileHome } from '../home/MobileHome'
+import { createSession as apiCreateSession } from '../../api/session'
 
 interface ChatPaneProps {
   paneId: string
@@ -143,6 +146,7 @@ export const ChatPane = memo(function ChatPane({
 }: ChatPaneProps) {
   const { t } = useTranslation(['chat', 'common'])
   const showCompactShell = displayMode === 'split' && !isPaneFullscreen
+  const isMobileViewport = useIsMobile()
 
   // Read the outer (App-level) viewport BEFORE this component's own Provider shadows it.
   // When fullscreen we pass this through so children keep the real desktop viewport;
@@ -339,6 +343,20 @@ export const ChatPane = memo(function ChatPane({
   const chatAreaMountKey = messagesReady ? (routeSessionId ?? 'home') : null
   const inputDisabled = !!routeSessionId && loadState === 'error' && messages.length === 0
   const chatPageViewModel = useChatPageViewModel(renderedMessages)
+
+  // ============================================
+  // Mobile Home (Work/Code 双 Tab)
+  // 仅移动端视口 + home（无 session）+ 单 pane 时展示
+  // ============================================
+  const showMobileHome = isMobileViewport && !routeSessionId && displayMode === 'single'
+
+  const handleStartCodingFromClone = useCallback(
+    async (directory: string) => {
+      const session = await apiCreateSession({ directory })
+      navigateToSession(makeSessionKey(paneServerId, session.id), directory)
+    },
+    [navigateToSession, paneServerId],
+  )
 
   // 切 session remount 时默认视为贴底，避免回底按钮闪一下
   useEffect(() => {
@@ -1051,7 +1069,13 @@ export const ChatPane = memo(function ChatPane({
             onFocus={handlePaneFocus}
           />
         )}
-        {chatContent}
+        {showMobileHome ? (
+          <MobileHome serverId={paneServerId} onStartCoding={handleStartCodingFromClone}>
+            {chatContent}
+          </MobileHome>
+        ) : (
+          chatContent
+        )}
         <PaneDropOverlay ref={overlayRef} />
         <FolderProjectDropOverlay active={isFolderDropActive} />
       </div>

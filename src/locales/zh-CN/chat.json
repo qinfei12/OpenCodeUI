@@ -28,6 +28,54 @@
     "startConversation": "开始对话",
     "orJustType": "或在下方直接输入消息，使用当前目录开始"
   },
+  "mobileHome": {
+    "title": "首页",
+    "tab": {
+      "work": "工作",
+      "code": "代码"
+    },
+    "token": {
+      "title": "连接 GitHub",
+      "description": "输入 GitHub Personal Access Token 以浏览你的仓库",
+      "placeholder": "粘贴 Token（ghp_... 或 github_pat_...）",
+      "save": "保存并继续",
+      "hint": "Token 仅保存在本机浏览器中，不会上传到服务器，需要 repo 读取权限"
+    },
+    "repos": {
+      "title": "你的仓库",
+      "subtitle": "选择仓库开始 AI 编程",
+      "changeToken": "更换 Token",
+      "private": "私有",
+      "empty": "没有找到仓库"
+    },
+    "branches": {
+      "subtitle": "选择分支",
+      "default": "默认",
+      "clone": "克隆到工作区"
+    },
+    "progress": {
+      "checking": "正在检查工作区…",
+      "cloning": "正在克隆仓库…",
+      "switching": "正在切换分支…"
+    },
+    "ready": {
+      "title": "仓库已就绪",
+      "start": "进入 AI 编程"
+    },
+    "common": {
+      "back": "返回",
+      "loading": "加载中…",
+      "retry": "重试"
+    },
+    "error": {
+      "unauthorized": "Token 无效或已过期，请重新输入",
+      "loadFailed": "加载失败，请检查网络后重试",
+      "cloneFailed": "克隆失败",
+      "worktreeConflict": "目标目录已存在且不是 git 仓库，无法覆盖",
+      "timeout": "命令执行超时，请重试",
+      "enterSession": "创建会话失败，请重试"
+    }
+  },
   "inputBox": {
     "dropFilesHere": "拖放文件到此处",
     "replyToAgentMobile": "回复 Agent...",

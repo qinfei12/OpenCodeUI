@@ -28,6 +28,54 @@
     "startConversation": "Start Conversation",
     "orJustType": "Or just type a message below to start with the current directory"
   },
+  "mobileHome": {
+    "title": "Home",
+    "tab": {
+      "work": "Work",
+      "code": "Code"
+    },
+    "token": {
+      "title": "Connect GitHub",
+      "description": "Enter a GitHub Personal Access Token to browse your repositories",
+      "placeholder": "Paste your token (ghp_... or github_pat_...)",
+      "save": "Save and continue",
+      "hint": "The token is stored only in this browser and never sent to the server. Requires repo read access."
+    },
+    "repos": {
+      "title": "Your repositories",
+      "subtitle": "Pick a repository to start AI coding",
+      "changeToken": "Change token",
+      "private": "Private",
+      "empty": "No repositories found"
+    },
+    "branches": {
+      "subtitle": "Select a branch",
+      "default": "default",
+      "clone": "Clone to workspace"
+    },
+    "progress": {
+      "checking": "Checking workspace...",
+      "cloning": "Cloning repository...",
+      "switching": "Switching branch..."
+    },
+    "ready": {
+      "title": "Repository ready",
+      "start": "Start AI coding"
+    },
+    "common": {
+      "back": "Back",
+      "loading": "Loading...",
+      "retry": "Retry"
+    },
+    "error": {
+      "unauthorized": "Token is invalid or expired, please enter a new one",
+      "loadFailed": "Failed to load, check your network and retry",
+      "cloneFailed": "Clone failed",
+      "worktreeConflict": "Target directory already exists and is not a git repository",
+      "timeout": "Command timed out, please retry",
+      "enterSession": "Failed to create session, please retry"
+    }
+  },
   "inputBox": {
     "dropFilesHere": "Drop files here",
     "replyToAgentMobile": "Reply to Agent...",
