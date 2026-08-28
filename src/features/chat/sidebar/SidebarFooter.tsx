@@ -11,10 +11,12 @@ import {
   MaximizeIcon,
   MinimizeIcon,
   ShareIcon,
+  SparklesIcon,
 } from '../../../components/Icons'
 import { CircularProgress } from '../../../components/CircularProgress'
 import { formatTokens, formatCost, useTheme, useSessionStats } from '../../../hooks'
 import { useHasMessages } from '../../../store'
+import { templateGalleryStore } from '../../../store/templateGalleryStore'
 
 // 状态指示器 - 圆环 + 右下角状态点
 function StatusIndicator({
@@ -303,6 +305,17 @@ export function SidebarFooter({
                 <span>{isWideMode ? t('sidebar.standardWidth') : t('sidebar.wideMode')}</span>
               </button>
             )}
+
+            <button
+              onClick={() => {
+                closeMenu()
+                templateGalleryStore.open()
+              }}
+              className="w-full flex items-center gap-2 px-2 py-1.5 rounded-md text-[length:var(--fs-sm)] text-text-300 hover:text-text-100 hover:bg-bg-200/50 transition-colors text-left"
+            >
+              <SparklesIcon size={14} />
+              <span>{t('sidebar.templates')}</span>
+            </button>
 
             <button
               onClick={() => {

@@ -50,6 +50,9 @@ const CommandPalette = lazy(() =>
 const CloseServiceDialog = lazy(() =>
   import('./components/CloseServiceDialog').then(module => ({ default: module.CloseServiceDialog })),
 )
+const TemplatesGallery = lazy(() =>
+  import('./features/chat/TemplatesGallery').then(module => ({ default: module.TemplatesGallery })),
+)
 
 const MOBILE_PAGER_SCROLL_END_MS = 120
 const MOBILE_RIGHT_PANEL_UNMOUNT_MS = 420
@@ -1054,6 +1057,7 @@ function App() {
             onClose={() => setCommandPaletteOpen(false)}
             commands={commands}
           />
+          <TemplatesGallery />
         </Suspense>
 
         <Suspense fallback={null}>

@@ -548,6 +548,25 @@ function InputBoxComponent({
     text,
   ])
 
+  // 在光标处插入文本（用于模板画廊快速填充）
+  const insertText = useCallback(
+    (inserted: string) => {
+      if (!inserted) return
+      const textarea = textareaRef.current
+      const start = textarea?.selectionStart ?? text.length
+      const end = textarea?.selectionEnd ?? text.length
+      const next = text.slice(0, start) + inserted + text.slice(end)
+      setText(next)
+      requestAnimationFrame(() => {
+        if (!textareaRef.current) return
+        const pos = start + inserted.length
+        textareaRef.current.setSelectionRange(pos, pos)
+        textareaRef.current.focus()
+      })
+    },
+    [text],
+  )
+
   // 更新 @ 查询文本（用于进入/退出文件夹）
   const updateMentionQuery = useCallback(
     (newQuery: string) => {
@@ -1406,6 +1425,7 @@ function InputBoxComponent({
                       onAbort={onAbort}
                       canSend={canSend || false}
                       onSend={handleSend}
+                      onInsertText={insertText}
                       models={models}
                       selectedModelKey={selectedModelKey}
                       onModelChange={onModelChange}

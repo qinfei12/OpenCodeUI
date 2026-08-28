@@ -1245,3 +1245,121 @@ body {
     transition: none;
   }
 }
+
+/* ============================================
+ * UI Enhancement Tokens — 渐变 / 光晕 / 抬升
+ * ============================================
+ * 在现有语义色之上扩展，所有渐变都基于已注册的
+ * accent / info / success / warning 令牌，保证主题一致。
+ * 组件只引用 class 名，不写具体数值。
+ */
+
+:root {
+  /* 品牌渐变（用于 hero、active 指示、卡片图标背景） */
+  --grad-brand: linear-gradient(135deg, hsl(var(--accent-main-100)), hsl(var(--accent-main-200)));
+  --grad-brand-soft: linear-gradient(
+    135deg,
+    hsl(var(--accent-main-100) / 0.16),
+    hsl(var(--accent-secondary-100) / 0.12)
+  );
+  --grad-info: linear-gradient(135deg, hsl(var(--info-100)), hsl(var(--info-200)));
+  --grad-success: linear-gradient(135deg, hsl(var(--success-100)), hsl(var(--success-200)));
+  --grad-warning: linear-gradient(135deg, hsl(var(--warning-100)), hsl(var(--warning-200)));
+  --grad-danger: linear-gradient(135deg, hsl(var(--danger-100)), hsl(var(--danger-200)));
+
+  /* 抬升阴影 — 比 --shadow-lg 更有空气感 */
+  --shadow-elevate: 0 10px 30px -12px rgb(0 0 0 / 0.22), 0 4px 10px -4px rgb(0 0 0 / 0.1);
+  --shadow-glow-brand: 0 8px 28px -8px hsl(var(--accent-main-100) / 0.5);
+
+  /* 半径：超大卡片 */
+  --radius-3xl: 24px;
+}
+
+/* — 装饰性背景：柔光径向 + 细网格，用于 hero / 空状态 — */
+.bg-aurora {
+  background-color: hsl(var(--bg-100));
+  background-image:
+    radial-gradient(60% 50% at 50% 0%, hsl(var(--accent-main-100) / 0.12), transparent 70%),
+    radial-gradient(40% 40% at 85% 15%, hsl(var(--accent-secondary-100) / 0.1), transparent 70%),
+    radial-gradient(40% 40% at 15% 25%, hsl(var(--info-100) / 0.08), transparent 70%);
+}
+
+.bg-grid-faint {
+  background-image:
+    linear-gradient(hsl(var(--border-200) / 0.18) 1px, transparent 1px),
+    linear-gradient(90deg, hsl(var(--border-200) / 0.18) 1px, transparent 1px);
+  background-size: 28px 28px;
+  background-position: -1px -1px;
+}
+
+/* — 文字渐变（用于标题强调） — */
+.text-grad-brand {
+  background: var(--grad-brand);
+  -webkit-background-clip: text;
+  background-clip: text;
+  -webkit-text-fill-color: transparent;
+  color: transparent;
+}
+
+/* — 抬升卡片基类 — */
+.surface-elevate {
+  background-color: hsl(var(--bg-000));
+  border: 1px solid hsl(var(--border-200) / 0.6);
+  box-shadow: var(--shadow-elevate);
+}
+
+:root[data-glass] .surface-elevate {
+  background-color: hsl(var(--bg-000) / 0.82);
+  -webkit-backdrop-filter: blur(22px) saturate(200%);
+  backdrop-filter: blur(22px) saturate(200%);
+}
+
+/* — 模板/快捷卡片：悬停抬升 + 边框点亮 — */
+.tile-interactive {
+  transition:
+    transform 180ms cubic-bezier(0.22, 1, 0.36, 1),
+    border-color 180ms ease,
+    box-shadow 180ms ease;
+}
+
+.tile-interactive:hover {
+  transform: translateY(-2px);
+  border-color: hsl(var(--accent-main-100) / 0.45);
+  box-shadow: var(--shadow-elevate);
+}
+
+.tile-interactive:active {
+  transform: translateY(0) scale(0.99);
+}
+
+/* — 圆形渐变图标徽章（卡片角标） — */
+.badge-grad {
+  background: var(--grad-brand);
+  color: hsl(var(--oncolor-100));
+  box-shadow: 0 4px 12px -4px hsl(var(--accent-main-100) / 0.5);
+}
+
+/* — 入场动画：从下方淡入并轻微上移 — */
+@keyframes rise-in {
+  from {
+    opacity: 0;
+    transform: translateY(10px) scale(0.985);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
+}
+
+.animate-rise-in {
+  animation: rise-in 320ms cubic-bezier(0.22, 1, 0.36, 1) both;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .animate-rise-in {
+    animation: none;
+  }
+  .tile-interactive:hover {
+    transform: none;
+  }
+}

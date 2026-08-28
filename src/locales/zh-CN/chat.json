@@ -29,7 +29,58 @@
     "current": "（当前）",
     "enterCustomPath": "输入自定义路径...",
     "startConversation": "开始对话",
-    "orJustType": "或在下方直接输入消息，使用当前目录开始"
+    "orJustType": "或在下方直接输入消息，使用当前目录开始",
+    "quickStart": "快速开始"
+  },
+  "templates": {
+    "title": "快速模板",
+    "subtitle": "选择一个模板快速开始，或在输入框直接编辑",
+    "searchPlaceholder": "搜索模板...",
+    "noResults": "没有匹配的模板",
+    "copied": "已复制",
+    "footerHint": "在输入框打开时选中即插入；其他入口会复制到剪贴板",
+    "items": {
+      "explain": {
+        "title": "解释代码",
+        "desc": "用通俗语言解读选中的文件或片段",
+        "prompt": "请解释这段代码的作用、关键逻辑与设计意图，并指出可能的注意点。"
+      },
+      "review": {
+        "title": "代码审查",
+        "desc": "检查质量、潜在缺陷与改进建议",
+        "prompt": "请对这段代码进行审查，关注正确性、可读性、性能与边界情况，并给出可执行的改进建议。"
+      },
+      "fixBug": {
+        "title": "修复 Bug",
+        "desc": "定位根因并给出最小修复方案",
+        "prompt": "我在遇到一个 Bug，请帮我定位根因并给出最小化的修复方案，先解释再给改动。"
+      },
+      "tests": {
+        "title": "编写测试",
+        "desc": "为当前代码补充覆盖关键路径的测试",
+        "prompt": "请为这段代码编写单元测试，覆盖关键路径与边界情况，并说明测试用例的意图。"
+      },
+      "refactor": {
+        "title": "重构优化",
+        "desc": "在不改变行为的前提下改善结构",
+        "prompt": "请在不改变外部行为的前提下重构这段代码，提升可读性与可维护性，并说明改动要点。"
+      },
+      "docs": {
+        "title": "生成文档",
+        "desc": "为代码生成清晰的注释或说明",
+        "prompt": "请为这段代码生成清晰的文档注释和使用说明，包含参数、返回值与示例。"
+      },
+      "feature": {
+        "title": "实现功能",
+        "desc": "拆解需求并逐步实现新功能",
+        "prompt": "请帮我实现这个功能：先拆解为可执行的步骤，再逐步给出代码实现与必要的说明。"
+      },
+      "commit": {
+        "title": "提交信息",
+        "desc": "根据改动生成规范的 Commit Message",
+        "prompt": "请根据当前的代码改动生成一条规范的 Conventional Commits 提交信息，并简要说明原因。"
+      }
+    }
   },
   "mobileHome": {
     "title": "首页",
@@ -145,7 +196,8 @@
     "attachFile": "附加文件",
     "stopGeneration": "停止生成",
     "sendingMessage": "发送消息中",
-    "sendMessage": "发送消息"
+    "sendMessage": "发送消息",
+    "templates": "快速模板"
   },
   "inputFooter": {
     "autoApproveOff": "自动放行：关闭",
@@ -192,6 +244,7 @@
     "wideMode": "宽屏模式",
     "shareChat": "分享对话",
     "settings": "设置",
+    "templates": "快速模板",
     "noProjectFoldersYet": "还没有项目文件夹",
     "addProjectDesc": "添加一个项目以按文件夹浏览最近的对话。",
     "deleteChat": "删除对话",

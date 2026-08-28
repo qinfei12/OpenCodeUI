@@ -447,10 +447,19 @@ export function SettingsDialog({ isOpen, onClose, initialTab = 'servers' }: Sett
                         aria-controls={`settings-panel-${vt.id}`}
                         onClick={() => switchTab(vt.id)}
                         tabIndex={active ? 0 : -1}
-                        className={`w-full min-h-8 flex items-center gap-2.5 px-2.5 py-1.5 rounded-lg text-[length:var(--fs-md)] font-medium transition-colors ${
-                          active ? 'bg-bg-200/70 text-text-100' : 'text-text-300 hover:bg-bg-200/40 hover:text-text-100'
+                        className={`relative w-full min-h-8 flex items-center gap-2.5 px-2.5 py-1.5 rounded-lg text-[length:var(--fs-md)] font-medium transition-colors overflow-hidden ${
+                          active
+                            ? 'bg-bg-200/70 text-text-100'
+                            : 'text-text-300 hover:bg-bg-200/40 hover:text-text-100'
                         }`}
                       >
+                        {active && (
+                          <span
+                            aria-hidden="true"
+                            className="absolute left-0 top-1.5 bottom-1.5 w-[2.5px] rounded-full"
+                            style={{ background: 'var(--grad-brand)' }}
+                          />
+                        )}
                         <span className={active ? 'text-accent-main-100' : 'text-text-400'}>{vt.icon}</span>
                         <span className="truncate">{vt.label}</span>
                       </button>
@@ -464,7 +473,7 @@ export function SettingsDialog({ isOpen, onClose, initialTab = 'servers' }: Sett
           {/* 版本号与菜单图标左边缘对齐，弱化为辅助信息 */}
           <div className="shrink-0 mt-2 px-2.5">
             <div
-              className="text-[length:var(--fs-xxs)] font-mono tabular-nums text-text-500/75 leading-snug truncate"
+              className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full border border-border-200/50 bg-bg-200/40 text-[length:var(--fs-xxs)] font-mono tabular-nums text-text-400 leading-snug"
               title={t('version', { version: __APP_VERSION__ })}
             >
               v{__APP_VERSION__}

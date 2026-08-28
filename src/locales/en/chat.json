@@ -29,7 +29,58 @@
     "current": "(current)",
     "enterCustomPath": "Enter custom path...",
     "startConversation": "Start Conversation",
-    "orJustType": "Or just type a message below to start with the current directory"
+    "orJustType": "Or just type a message below to start with the current directory",
+    "quickStart": "Quick Start"
+  },
+  "templates": {
+    "title": "Quick Templates",
+    "subtitle": "Pick a template to get started, or edit directly in the input box",
+    "searchPlaceholder": "Search templates...",
+    "noResults": "No matching templates",
+    "copied": "Copied",
+    "footerHint": "When opened from the input box, selecting inserts text; other entries copy to clipboard",
+    "items": {
+      "explain": {
+        "title": "Explain Code",
+        "desc": "Break down a file or snippet in plain language",
+        "prompt": "Please explain what this code does, its key logic and design intent, and point out anything to watch for."
+      },
+      "review": {
+        "title": "Code Review",
+        "desc": "Check quality, defects and improvements",
+        "prompt": "Please review this code, focusing on correctness, readability, performance and edge cases, with actionable suggestions."
+      },
+      "fixBug": {
+        "title": "Fix a Bug",
+        "desc": "Find the root cause and a minimal fix",
+        "prompt": "I'm hitting a bug — help me find the root cause and a minimal fix; explain first, then show the change."
+      },
+      "tests": {
+        "title": "Write Tests",
+        "desc": "Add tests covering key paths and edges",
+        "prompt": "Please write unit tests for this code, covering key paths and edge cases, and explain the intent of each case."
+      },
+      "refactor": {
+        "title": "Refactor",
+        "desc": "Improve structure without changing behavior",
+        "prompt": "Please refactor this code without changing its external behavior, improving readability and maintainability, and explain the changes."
+      },
+      "docs": {
+        "title": "Generate Docs",
+        "desc": "Produce clear comments and usage notes",
+        "prompt": "Please generate clear documentation and usage notes for this code, including parameters, return values and examples."
+      },
+      "feature": {
+        "title": "Implement Feature",
+        "desc": "Break down the requirement and build it",
+        "prompt": "Help me implement this feature: break it into steps first, then provide the code with necessary explanations."
+      },
+      "commit": {
+        "title": "Commit Message",
+        "desc": "Generate a conventional commit message",
+        "prompt": "Based on the current changes, generate a conventional commit message and briefly explain the reasoning."
+      }
+    }
   },
   "mobileHome": {
     "title": "Home",
@@ -145,7 +196,8 @@
     "attachFile": "Attach file",
     "stopGeneration": "Stop generation",
     "sendingMessage": "Sending message",
-    "sendMessage": "Send message"
+    "sendMessage": "Send message",
+    "templates": "Quick Templates"
   },
   "inputFooter": {
     "autoApproveOff": "Auto-approve: off",
@@ -192,6 +244,7 @@
     "wideMode": "Wide Mode",
     "shareChat": "Share Chat",
     "settings": "Settings",
+    "templates": "Quick Templates",
     "noProjectFoldersYet": "No project folders yet",
     "addProjectDesc": "Add a project to browse recent chats by folder.",
     "deleteChat": "Delete Chat",
