@@ -345,8 +345,21 @@ export function SettingsDialog({ isOpen, onClose, initialTab = 'servers' }: Sett
         rawContent
       >
         <div className="flex min-h-0 flex-1 flex-col">
+          {/* Header — 标题 + 关闭按钮 */}
+          <div className="shrink-0 flex items-center justify-between px-4 pt-1 pb-2">
+            <h2 className="text-[length:var(--fs-heading-2)] font-semibold text-text-100">{t('title')}</h2>
+            <button
+              type="button"
+              onClick={onClose}
+              className="flex items-center justify-center w-8 h-8 rounded-md text-text-400 hover:text-text-200 hover:bg-bg-200/70 transition-colors"
+              aria-label={t('closeSettings')}
+              title={t('closeSettings')}
+            >
+              <CloseIcon size={18} />
+            </button>
+          </div>
           {/* Sticky Tabs — 无标题、无线条，与桌面端设计语言一致 */}
-          <div className="shrink-0 pt-2">
+          <div className="shrink-0">
             <div className="px-3 pb-2">{search}</div>
             <div
               role="tablist"
