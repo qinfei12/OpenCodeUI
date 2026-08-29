@@ -1,0 +1,49 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>UI 增强截图</title>
+<style>
+* { margin:0; padding:0; box-sizing:border-box; }
+body { font-family:system-ui,-apple-system,sans-serif; background:#f5f6f8; color:#1a1d21; padding:20px; }
+h1 { font-size:20px; margin-bottom:16px; }
+.card { background:#fff; border-radius:12px; padding:16px; margin-bottom:20px; box-shadow:0 2px 8px rgba(0,0,0,0.08); }
+.card h2 { font-size:16px; margin-bottom:8px; }
+.card .desc { font-size:13px; color:#5b6472; margin-bottom:12px; line-height:1.6; }
+.card img { width:100%; border-radius:8px; border:1px solid #e4e6ea; }
+.changes { background:#e8f2ea; border-left:3px solid #4f7c59; padding:8px 12px; margin-top:8px; border-radius:4px; font-size:12px; }
+.changes b { color:#4f7c59; }
+</style>
+</head>
+<body>
+<h1>UI 增强真实截图（运行中的 dev server）</h1>
+
+<div class="card">
+  <h2>① 空状态页 EmptyState</h2>
+  <div class="desc">点击 New Chat 后看到的空状态页面</div>
+  <img src="/real-01-empty-state.png" alt="Empty State" />
+  <div class="changes">
+    <b>改动点：</b>bg-aurora 渐变背景 · bg-grid-faint 网格层 · animate-rise-in 入场动画 · badge-grad 图标渐变 · text-grad-brand 标题渐变色 · start button 渐变+光晕 · 快速开始 chips（解释代码/修Bug/测试/审查）
+  </div>
+</div>
+
+<div class="card">
+  <h2>② 设置页 Settings Dialog</h2>
+  <div class="desc">点击 Settings 后打开的设置对话框</div>
+  <img src="/real-02-settings.png" alt="Settings" />
+  <div class="changes">
+    <b>改动点：</b>左侧 Tab 激活项渐变左边条（var(--grad-brand)） · 版本号胶囊样式 · 移动端新增标题栏+关闭按钮
+  </div>
+</div>
+
+<div class="card">
+  <h2>③ 模板画廊 Templates Gallery</h2>
+  <div class="desc">点击工具栏 ✨ 按钮后打开的模板画廊</div>
+  <img src="/real-03-templates-gallery.png" alt="Templates Gallery" />
+  <div class="changes">
+    <b>改动点：</b>新增独立组件 TemplatesGallery · 搜索框 + 分类筛选 pill · 8 张模板卡片 · tile-interactive 悬停抬升效果 · 底部操作栏
+  </div>
+</div>
+</body>
+</html>
