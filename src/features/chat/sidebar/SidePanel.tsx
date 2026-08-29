@@ -1100,8 +1100,19 @@ export function SidePanel({
             opacity: showLabels ? 1 : 0,
           }}
         >
-          <a href="/" className="flex items-center whitespace-nowrap">
-            <span className="text-[length:var(--fs-heading-3)] font-semibold text-text-100 tracking-tight">
+          <a href="/" className="flex items-center whitespace-nowrap gap-2">
+            {/* 品牌图标：渐变小方块 */}
+            <span
+              aria-hidden="true"
+              className="inline-flex h-6 w-6 items-center justify-center rounded-lg"
+              style={{
+                background: 'var(--grad-brand)',
+                boxShadow: '0 4px 10px -3px hsl(var(--accent-main-100) / 0.5)',
+              }}
+            >
+              <span className="text-oncolor-100 text-[13px] font-bold leading-none">{'</>'}</span>
+            </span>
+            <span className="sidebar-brand-title text-[length:var(--fs-heading-3)] font-semibold tracking-tight">
               {t('header.openCode')}
             </span>
           </a>
@@ -1124,38 +1135,49 @@ export function SidePanel({
       </div>
 
       {/* ===== Navigation - 图标位置固定；间距与 Header 面板按钮对齐 ===== */}
-      <div className="flex flex-col gap-0.5 mx-2 -mt-2.5">
-        {/* New Chat - 图标始终在 padding-left: 6px 位置，收起时刚好居中 */}
+      <div className="flex flex-col gap-2 mx-3 mt-2 mb-1">
+        {/* New Chat - 主 CTA：渐变胶囊 + 光晕（收起时仍保持图标样式但不占满） */}
         <button
           type="button"
           onClick={onNewSession}
           aria-label={t('sidebar.newChat')}
-          className="h-8 flex items-center rounded-lg text-text-300 hover:text-text-100 hover:bg-bg-200 active:scale-[0.98] transition-all duration-300 group overflow-hidden"
-          style={{
-            width: showLabels ? '100%' : 32,
-            paddingLeft: 6,
-            paddingRight: 6,
-          }}
+          className={`flex items-center rounded-xl active:scale-[0.98] transition-all duration-300 group overflow-hidden ${
+            showLabels ? 'btn-primary-grad h-9 px-2.5' : 'h-8 w-8 justify-center hover:bg-bg-200 text-text-300 hover:text-text-100'
+          }`}
+          style={
+            showLabels
+              ? undefined
+              : ({ paddingLeft: 4, paddingRight: 4, width: 32, height: 32 } as React.CSSProperties)
+          }
           title={t('sidebar.newChat')}
         >
-          <span className="size-5 flex items-center justify-center shrink-0">
-            <NewChatIcon size={16} />
+          <span className={`${showLabels ? 'size-5 flex items-center justify-center shrink-0' : 'shrink-0'}`}>
+            <NewChatIcon size={16} className={showLabels ? 'text-oncolor-100' : ''} />
           </span>
           <span
-            className="ml-2 text-[length:var(--fs-base)] whitespace-nowrap transition-opacity duration-300"
+            className={`ml-2 text-[length:var(--fs-base)] font-medium whitespace-nowrap transition-opacity duration-300 ${
+              showLabels ? 'text-oncolor-100' : 'opacity-0 pointer-events-none'
+            }`}
             style={{ opacity: showLabels ? 1 : 0 }}
           >
             {t('sidebar.newChat')}
           </span>
           <span
-            className="ml-auto text-[length:var(--fs-xxs)] text-text-500 opacity-0 group-hover:opacity-100 transition-opacity whitespace-nowrap"
-            style={{ opacity: showLabels ? undefined : 0 }}
+            className="ml-auto text-[length:var(--fs-xxs)] font-medium opacity-0 group-hover:opacity-90 transition-opacity whitespace-nowrap"
+            style={{
+              opacity: showLabels ? undefined : 0,
+              color: 'hsl(var(--oncolor-100) / 0.75)',
+              background: 'rgb(255 255 255 / 0.10)',
+              padding: '2px 6px',
+              borderRadius: 6,
+            }}
           >
             {newChatShortcut}
           </span>
         </button>
 
         {/* Project Selector - 收起时仅图标，点击展开侧栏并打开列表 */}
+        <div className="mt-0.5">
         <button
           ref={projectToggleRef}
           type="button"
@@ -1169,15 +1191,15 @@ export function SidePanel({
           }}
           aria-expanded={showLabels ? projectsExpanded : false}
           aria-label={currentProjectLabel}
-          className={`h-8 flex items-center rounded-lg active:scale-[0.98] transition-all duration-300 overflow-hidden ${
+          className={`h-9 flex items-center rounded-xl active:scale-[0.98] transition-all duration-300 overflow-hidden border ${
             projectsExpanded && showLabels
-              ? 'bg-bg-200 text-text-100'
-              : 'text-text-300 hover:text-text-100 hover:bg-bg-200'
+              ? 'bg-bg-200/70 border-border-200/60 text-text-100 shadow-inner'
+              : 'border-transparent text-text-300 hover:text-text-100 hover:bg-bg-200/60 hover:border-border-200/40'
           }`}
           style={{
             width: showLabels ? '100%' : 32,
-            paddingLeft: 6,
-            paddingRight: 6,
+            paddingLeft: showLabels ? 8 : 6,
+            paddingRight: showLabels ? 8 : 6,
           }}
           title={currentProjectLabel}
         >
@@ -1193,7 +1215,7 @@ export function SidePanel({
             style={{ opacity: showLabels ? 1 : 0 }}
           >
             <div
-              className="block overflow-hidden whitespace-nowrap text-left"
+              className="block overflow-hidden whitespace-nowrap text-left font-medium"
               style={{
                 WebkitMaskImage: 'linear-gradient(to right, black 82%, transparent 100%)',
                 maskImage: 'linear-gradient(to right, black 82%, transparent 100%)',
@@ -1210,6 +1232,7 @@ export function SidePanel({
             style={{ opacity: showLabels ? 1 : 0 }}
           />
         </button>
+        </div>
 
         {/* Projects Dropdown */}
         <div
@@ -1328,10 +1351,10 @@ export function SidePanel({
           </div>
         </div>
 
-        {/* Search — 与上方导航同列 gap-0.5；收起时图标，展开时输入框 */}
+        {/* Search — 与上方导航同列；收起时图标，展开时搜索玻璃胶囊 */}
         {showLabels ? (
-          <div className="relative w-full">
-            <span className="pointer-events-none absolute left-[6px] top-1/2 -translate-y-1/2 size-5 flex items-center justify-center text-text-300">
+          <div className="relative w-full search-glass">
+            <span className="pointer-events-none absolute left-[8px] top-1/2 -translate-y-1/2 size-5 flex items-center justify-center text-text-400">
               <SearchIcon size={16} />
             </span>
             <input
@@ -1344,16 +1367,16 @@ export function SidePanel({
               aria-label={t('sidebar.searchChats')}
               autoComplete="off"
               spellCheck={false}
-              className="h-8 w-full appearance-none rounded-lg border-0 bg-transparent pl-[34px] pr-[26px] text-[length:var(--fs-base)] text-text-100 shadow-none outline-none ring-0 placeholder:text-text-300 transition-shadow focus-visible:ring-1 focus-visible:ring-accent-main-100/30"
+              className="h-9 w-full appearance-none rounded-[10px] border-0 bg-transparent pl-[36px] pr-[28px] text-[length:var(--fs-base)] text-text-100 shadow-none outline-none ring-0 placeholder:text-text-400 transition-shadow"
             />
             {search && (
               <button
                 type="button"
                 onClick={() => setSearch('')}
-                className="absolute right-[6px] top-1/2 flex size-[14px] -translate-y-1/2 items-center justify-center text-text-400 hover:text-text-100"
+                className="absolute right-[8px] top-1/2 flex size-[16px] -translate-y-1/2 items-center justify-center rounded-full text-text-400 hover:text-text-100 hover:bg-bg-300/60 transition-colors"
                 aria-label={t('sidebar.clearSearch')}
               >
-                <CloseIcon size={14} />
+                <CloseIcon size={13} />
               </button>
             )}
           </div>
@@ -1386,7 +1409,7 @@ export function SidePanel({
       >
         {/* Tab Bar: Recents / Active */}
         <div className="flex-1 flex flex-col min-h-0 overflow-hidden">
-          <div className="flex items-center mx-2 gap-1 shrink-0">
+          <div className="flex items-center mx-3 mt-2 mb-2 gap-1 shrink-0">
             {isEditMode && sidebarTab === 'recents' ? (
               <>
                 {/* 与 tab 同字号字重，左侧文案变成状态提示 */}
@@ -1440,48 +1463,70 @@ export function SidePanel({
               </>
             ) : (
               <>
-                <button
-                  type="button"
-                  onClick={() => {
-                    setSidebarTab('recents')
-                    if (sidebarTab !== 'recents') exitEditMode()
-                  }}
-                  className={`pl-[6px] pr-2 py-1.5 text-[length:var(--fs-xxs)] font-semibold uppercase tracking-wider transition-colors duration-150 ${
-                    sidebarTab === 'recents' ? 'text-text-100' : 'text-text-500 hover:text-text-300'
-                  }`}
-                >
-                  {t('sidebar.recents')}
-                </button>
-                <button
-                  type="button"
-                  onClick={() => {
-                    setSidebarTab('active')
-                    exitEditMode()
-                  }}
-                  className={`pl-[6px] pr-2 py-1.5 text-[length:var(--fs-xxs)] font-semibold uppercase tracking-wider transition-colors duration-150 flex items-center gap-1 ${
-                    sidebarTab === 'active' ? 'text-text-100' : 'text-text-500 hover:text-text-300'
-                  }`}
-                >
-                  <span className="inline-flex h-4 items-center leading-none">{t('sidebar.active')}</span>
-                  {attentionCount > 0 && (
-                    <span
-                      className={`inline-flex h-[15px] min-w-[15px] shrink-0 items-center justify-center self-center rounded-full px-1 text-[length:var(--fs-xxs)] font-medium leading-none transition-colors ${
-                        attentionCount > busyCount
-                          ? 'bg-accent-main-100/10 text-accent-main-100'
-                          : 'bg-success-100/10 text-success-100'
-                      }`}
-                    >
-                      {attentionCount}
-                    </span>
-                  )}
-                </button>
+                {/* Pill Tabs 容器：2 个 tab + 注意力徽标 */}
+                <div className="pill-tabs flex-1 min-w-0">
+                  {/* 滑块指示器：纯 CSS transform 驱动 */}
+                  <span
+                    aria-hidden="true"
+                    className="pill-tabs-indicator"
+                    style={{
+                      width: sidebarTab === 'recents' ? 'calc(50% - 0px)' : 'calc(50% - 0px)',
+                      transform:
+                        sidebarTab === 'recents' ? 'translateX(0px)' : 'translateX(calc(100% + 0px))',
+                    }}
+                  />
+                  <button
+                    type="button"
+                    onClick={() => {
+                      setSidebarTab('recents')
+                      if (sidebarTab !== 'recents') exitEditMode()
+                    }}
+                    className={`relative z-10 flex-1 h-7 flex items-center justify-center rounded-lg text-[length:var(--fs-xxs)] font-semibold uppercase tracking-wider transition-colors duration-150 ${
+                      sidebarTab === 'recents' ? 'text-text-100' : 'text-text-500 hover:text-text-300'
+                    }`}
+                  >
+                    {t('sidebar.recents')}
+                  </button>
+                  <button
+                    type="button"
+                    onClick={() => {
+                      setSidebarTab('active')
+                      exitEditMode()
+                    }}
+                    className={`relative z-10 flex-1 h-7 flex items-center justify-center gap-1 rounded-lg text-[length:var(--fs-xxs)] font-semibold uppercase tracking-wider transition-colors duration-150 ${
+                      sidebarTab === 'active' ? 'text-text-100' : 'text-text-500 hover:text-text-300'
+                    }`}
+                  >
+                    <span className="inline-flex h-4 items-center leading-none">{t('sidebar.active')}</span>
+                    {attentionCount > 0 && (
+                      <span
+                        className={`inline-flex h-[15px] min-w-[15px] shrink-0 items-center justify-center self-center rounded-full px-1 text-[10px] font-semibold leading-none transition-colors ${
+                          attentionCount > busyCount
+                            ? 'text-accent-main-100'
+                            : 'text-success-100'
+                        }`}
+                        style={{
+                          background:
+                            attentionCount > busyCount
+                              ? 'hsl(var(--accent-main-100) / 0.14)'
+                              : 'hsl(var(--success-100) / 0.14)',
+                          boxShadow: attentionCount > busyCount
+                            ? 'inset 0 0 0 1px hsl(var(--accent-main-100) / 0.25)'
+                            : 'inset 0 0 0 1px hsl(var(--success-100) / 0.25)',
+                        }}
+                      >
+                        {attentionCount}
+                      </span>
+                    )}
+                  </button>
+                </div>
                 {sidebarTab === 'recents' && (
                   <button
                     type="button"
                     onMouseDown={e => e.preventDefault()}
                     onClick={enterEditMode}
                     aria-label={t('sidebar.manageSessions')}
-                    className="ml-auto p-1 rounded-md text-text-500 hover:text-text-300 hover:bg-bg-200/50 transition-colors duration-150"
+                    className="ml-1 p-1.5 rounded-lg text-text-500 hover:text-text-300 hover:bg-bg-200/60 transition-colors duration-150"
                     title={t('sidebar.manageSessions')}
                   >
                     <ListFilterIcon size={14} />

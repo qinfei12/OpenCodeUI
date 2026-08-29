@@ -940,7 +940,7 @@ export const ChatArea = memo(
       )
 
       return (
-        <div className="h-full overflow-hidden contain-strict relative">
+        <div className="h-full overflow-hidden contain-strict relative chat-area-bg">
           {loadState === 'loading' && visibleMessages.length === 0 && (
             <div className="absolute inset-0 z-10 flex items-center justify-center">
               <div className="flex flex-col items-center gap-3 text-text-400 session-loading-indicator">
@@ -953,10 +953,18 @@ export const ChatArea = memo(
           <div
             ref={setScrollRoot}
             data-chat-scroll-root="true"
-            className="h-full overflow-y-auto overflow-x-hidden custom-scrollbar contain-content"
+            className="h-full overflow-y-auto overflow-x-hidden custom-scrollbar contain-content relative"
             style={{
               overflowAnchor: 'none',
               paddingTop: 'calc(5rem + var(--app-safe-top, 0px))',
+              backgroundImage:
+                visibleMessages.length === 0
+                  ? undefined
+                  : `
+                    radial-gradient(55% 35% at 50% 0%, hsl(var(--accent-main-100) / 0.05), transparent 70%),
+                    radial-gradient(40% 30% at 100% 20%, hsl(var(--accent-secondary-100) / 0.04), transparent 70%)
+                  `,
+              backgroundAttachment: 'local',
             }}
             onWheel={onWheel}
             onTouchStart={onTouchStart}

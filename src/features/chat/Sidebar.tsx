@@ -289,7 +289,7 @@ export const Sidebar = memo(function Sidebar({
     if (mobileInline) {
       return (
         <>
-          <div className="relative flex h-full w-full flex-col overflow-hidden bg-bg-100 [contain:strict]">
+          <div className="relative flex h-full w-full flex-col overflow-hidden sidebar-surface [contain:strict]">
             <SidePanel
               onNewSession={onNewSession}
               onSelectSession={handleSelectSession}
@@ -335,7 +335,7 @@ export const Sidebar = memo(function Sidebar({
           onTouchCancel={handleSidebarTouchEnd}
           className={`
             fixed left-0 z-40
-            flex flex-col bg-bg-100 shadow-lg
+            flex flex-col sidebar-surface shadow-lg
             ${isSwipingActive ? '' : 'transition-transform duration-300 ease-out'}
             ${isOpen ? 'translate-x-0' : '-translate-x-full'}
           `}
@@ -378,11 +378,16 @@ export const Sidebar = memo(function Sidebar({
         ref={sidebarRef}
         style={{ width: `${layout.sidebar.dockedWidth}px` }}
         className={`
-          relative flex flex-col h-full bg-bg-100 overflow-hidden shrink-0 min-w-0
+          relative flex flex-col h-full sidebar-surface overflow-hidden shrink-0 min-w-0
           border-r border-border-200/50
           ${isResizing ? 'transition-none' : 'transition-[width] duration-300 ease-out'}
         `}
       >
+        {/* 右侧渐变边条 — 侧栏与正文的柔和彩色分界 */}
+        <div
+          aria-hidden="true"
+          className="sidebar-edge-accent absolute top-0 right-0 h-full w-[2px] pointer-events-none z-10"
+        />
         <SidePanel
           onNewSession={onNewSession}
           onSelectSession={onSelectSession}
