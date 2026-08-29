@@ -144,6 +144,7 @@ const MessageBody = memo(function MessageBody({
       ref={node => registerMessage?.(messageId, node as HTMLDivElement | null)}
       data-message-id={messageId}
       data-anchor-source-id={forkMessageId ?? messageId}
+      className="chat-message-row"
     >
       <div className={`flex ${isUser ? 'justify-end' : 'justify-start'}`}>
         <div className={`message-renderer-shell min-w-0 group ${!isUser ? 'w-full' : ''}`}>
@@ -940,7 +941,7 @@ export const ChatArea = memo(
       )
 
       return (
-        <div className="h-full overflow-hidden contain-strict relative chat-area-bg">
+        <div className="h-full overflow-hidden contain-strict relative chat-area-bg chat-canvas-vignette">
           {loadState === 'loading' && visibleMessages.length === 0 && (
             <div className="absolute inset-0 z-10 flex items-center justify-center">
               <div className="flex flex-col items-center gap-3 text-text-400 session-loading-indicator">
@@ -981,58 +982,64 @@ export const ChatArea = memo(
             )}
 
             <div ref={setVirtualContent} style={{ position: 'relative', width: '100%' }}>
-              {items.map(item => {
-                const timelineItem = timeline[item.index]
-                if (!timelineItem) return null
-                return (
-                  <VirtualRow
-                    key={item.key}
-                    virtualItem={item}
-                    item={timelineItem}
-                    maxWidthClass={maxWidthClass}
-                    paddingClass={paddingClass}
-                    rowYClass={getTimelineRowYClass(timelineItem, timeline[item.index - 1], timeline[item.index + 1])}
-                    registerMessage={registerMessage}
-                    onUndo={onUndo}
-                    onFork={onFork}
-                    canUndo={canUndo}
-                    forkMap={forkMap}
-                    turnDurationMap={turnDurationMap}
-                    turnLatestAssistantIds={turnLatestAssistantIds}
-                    allowStreamingLayoutAnimation={allowStreamingLayoutAnimation}
-                    measureElement={virtualizer.measureElement as (el: HTMLElement | null) => void}
-                    onEntryGrowComplete={emptyShellGate.onEntryGrowComplete}
-                  />
-                )
-              })}
+              <div className="chat-center-col">
+                {items.map(item => {
+                  const timelineItem = timeline[item.index]
+                  if (!timelineItem) return null
+                  return (
+                    <VirtualRow
+                      key={item.key}
+                      virtualItem={item}
+                      item={timelineItem}
+                      maxWidthClass={maxWidthClass}
+                      paddingClass={paddingClass}
+                      rowYClass={getTimelineRowYClass(timelineItem, timeline[item.index - 1], timeline[item.index + 1])}
+                      registerMessage={registerMessage}
+                      onUndo={onUndo}
+                      onFork={onFork}
+                      canUndo={canUndo}
+                      forkMap={forkMap}
+                      turnDurationMap={turnDurationMap}
+                      turnLatestAssistantIds={turnLatestAssistantIds}
+                      allowStreamingLayoutAnimation={allowStreamingLayoutAnimation}
+                      measureElement={virtualizer.measureElement as (el: HTMLElement | null) => void}
+                      onEntryGrowComplete={emptyShellGate.onEntryGrowComplete}
+                    />
+                  )
+                })}
+              </div>
             </div>
 
             {/* 顺序必须是：消息 → 重试/错误提示 → 输入框占位。
                 旧 Virtuoso Footer 就是这样；换 virtualizer 后 paddingEnd 在前、提示在后，会叠到输入框下。 */}
             {retryStatus && (
-              <div className={`w-full ${maxWidthClass} mx-auto ${paddingClass}`}>
-                <div className="flex justify-start">
-                  <div className="w-full min-w-0">
-                    <RetryStatusInline status={retryStatus} />
+              <div className="chat-center-col">
+                <div className={`w-full ${maxWidthClass} mx-auto ${paddingClass}`}>
+                  <div className="flex justify-start">
+                    <div className="w-full min-w-0">
+                      <RetryStatusInline status={retryStatus} />
+                    </div>
                   </div>
                 </div>
               </div>
             )}
 
             {visibleMessages.length === 0 && (loadError || connectionError) && (
-              <div className={`w-full ${maxWidthClass} mx-auto ${paddingClass}`}>
-                <div className="flex justify-start">
-                  <div className="w-full min-w-0 space-y-2">
-                    <MessageErrorView error={loadError ?? connectionError!} />
-                    {connectionError && onOpenSettings && (
-                      <button
-                        type="button"
-                        onClick={onOpenSettings}
-                        className="rounded-md border border-border-200 bg-bg-100 px-3 py-1.5 text-[length:var(--fs-sm)] text-text-200 transition-colors hover:bg-bg-200"
-                      >
-                        Open server settings
-                      </button>
-                    )}
+              <div className="chat-center-col">
+                <div className={`w-full ${maxWidthClass} mx-auto ${paddingClass}`}>
+                  <div className="flex justify-start">
+                    <div className="w-full min-w-0 space-y-2">
+                      <MessageErrorView error={loadError ?? connectionError!} />
+                      {connectionError && onOpenSettings && (
+                        <button
+                          type="button"
+                          onClick={onOpenSettings}
+                          className="rounded-md border border-border-200 bg-bg-100 px-3 py-1.5 text-[length:var(--fs-sm)] text-text-200 transition-colors hover:bg-bg-200"
+                        >
+                          Open server settings
+                        </button>
+                      )}
+                    </div>
                   </div>
                 </div>
               </div>

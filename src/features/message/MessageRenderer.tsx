@@ -462,7 +462,7 @@ const CollapsibleUserText = memo(function CollapsibleUserText({
   return (
     <div
       ref={rootRef}
-      className={`px-4 py-2.5 bg-bg-300 rounded-2xl max-w-full ${hasHtmlArtifact ? 'w-full max-w-2xl' : ''}`}
+      className={`bubble-user ${hasHtmlArtifact ? 'w-full max-w-2xl' : ''}`}
     >
       <div className="relative">
         <div
@@ -470,7 +470,7 @@ const CollapsibleUserText = memo(function CollapsibleUserText({
             contentRef.current = node
             headerRef(node)
           }}
-          className={`m-0 break-words text-[length:var(--fs-base)] text-text-100 leading-relaxed${
+          className={`m-0 break-words text-[length:var(--fs-base)] leading-relaxed${
             renderMarkdown ? '' : ' whitespace-pre-wrap'
           }${
             isCollapsed ? ' overflow-hidden' : ''
@@ -484,11 +484,11 @@ const CollapsibleUserText = memo(function CollapsibleUserText({
               : undefined
           }
         >
-          {renderMarkdown ? <MarkdownRenderer content={text} /> : text}
+          {renderMarkdown ? <div className="prose-relaxed"><MarkdownRenderer content={text} /></div> : text}
         </div>
         {/* 底部渐变遮罩 */}
         {showCollapse && isCollapsed && (
-          <div className="absolute bottom-0 left-0 right-0 h-12 bg-gradient-to-t from-bg-300 to-transparent pointer-events-none" />
+          <div className="absolute bottom-0 left-0 right-0 h-12 bg-gradient-to-t from-accent-main-200 to-transparent pointer-events-none" />
         )}
       </div>
       {showCollapse && (
@@ -813,11 +813,13 @@ const AssistantMessageView = memo(function AssistantMessageView({
   if (!isStreaming && parts.length === 0) {
     // process/final 空内容时不占位
     if (processContentScope === 'process' || processContentScope === 'final') return null
-    // 有错误时直接显示错误信息
+    // 有错误时直接显示错误信息（同样包卡片外壳，与正常助手消息视觉一致）
     if (messageError) {
       return (
-        <div className={`flex flex-col ${MSG_SPACING.stack} w-full`}>
-          <MessageErrorView error={messageError} stateKey={`message:${message.info.id}:error`} />
+        <div className={`flex flex-col ${MSG_SPACING.stack} w-full group`}>
+          <div className="bubble-assistant">
+            <MessageErrorView error={messageError} stateKey={`message:${message.info.id}:error`} />
+          </div>
         </div>
       )
     }
