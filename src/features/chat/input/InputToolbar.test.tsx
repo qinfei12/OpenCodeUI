@@ -205,7 +205,7 @@ describe('InputToolbar file selection', () => {
 
     await waitFor(() => {
       expect(trigger).toHaveAttribute('aria-expanded', 'false')
-      expect(screen.getByRole('button', { name: 'Send message' })).toHaveFocus()
+      expect(screen.getByRole('button', { name: 'Quick Templates' })).toHaveFocus()
     })
   })
 

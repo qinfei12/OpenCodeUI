@@ -21,7 +21,11 @@ export const TextPartView = memo(function TextPartView({ part, isStreaming = fal
 
   return (
     <div style={{ contain: 'layout' }}>
-      <MarkdownRenderer content={displayText} isStreaming={isStreaming} />
+      <div className="bubble-assistant">
+        <div className="prose-relaxed">
+          <MarkdownRenderer content={displayText} isStreaming={isStreaming} />
+        </div>
+      </div>
     </div>
   )
 })

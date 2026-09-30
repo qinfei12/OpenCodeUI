@@ -1,8 +1,9 @@
 import { useState, useEffect, useRef } from 'react'
 import { useTranslation } from 'react-i18next'
-import { MessageSquareIcon, FolderIcon, ChevronDownIcon, NewChatIcon } from '../../components/Icons'
+import { MessageSquareIcon, FolderIcon, ChevronDownIcon, NewChatIcon, SparklesIcon } from '../../components/Icons'
 import { getPath, type ApiProject, type ApiPath } from '../../api'
 import { serverStore } from '../../store/serverStore'
+import { templateGalleryStore } from '../../store/templateGalleryStore'
 import { handleError } from '../../utils'
 
 interface EmptyStateProps {
@@ -97,18 +98,26 @@ export function EmptyState({ currentProject, projects, onStartChat }: EmptyState
     .map(p => p.worktree)
 
   return (
-    <div className="flex-1 flex items-center justify-center p-8">
-      <div className="max-w-md w-full">
-        {/* Logo / Icon */}
-        <div className="flex justify-center mb-6">
-          <div className="w-16 h-16 rounded-2xl bg-gradient-to-br from-accent-main-100 to-accent-main-200 flex items-center justify-center">
-            <MessageSquareIcon className="w-8 h-8 text-oncolor-100" />
+    <div className="relative flex-1 flex items-center justify-center p-8 bg-aurora overflow-hidden">
+      {/* 装饰网格层 — 极淡，营造空间感 */}
+      <div className="pointer-events-none absolute inset-0 bg-grid-faint opacity-[0.35] [mask-image:radial-gradient(70%_60%_at_50%_40%,black,transparent)]" />
+
+      <div className="relative max-w-md w-full animate-rise-in">
+        {/* Logo / Icon — 渐变方块 + 柔光晕 */}
+        <div className="relative flex justify-center mb-6">
+          <div
+            className="absolute inset-0 -z-10 blur-2xl opacity-60"
+            style={{ background: 'var(--grad-brand)' }}
+            aria-hidden="true"
+          />
+          <div className="w-16 h-16 rounded-2xl badge-grad flex items-center justify-center">
+            <MessageSquareIcon className="w-8 h-8" />
           </div>
         </div>
 
         {/* Title */}
-        <h2 className="text-[length:var(--fs-heading-1)] font-semibold text-text-100 text-center mb-2">
-          {t('emptyState.title')}
+        <h2 className="text-[length:var(--fs-heading-1)] font-semibold text-center mb-2 leading-tight">
+          <span className="text-grad-brand">{t('emptyState.title')}</span>
         </h2>
         <p className="text-[length:var(--fs-base)] text-text-400 text-center mb-6">{t('emptyState.description')}</p>
 
@@ -208,13 +217,36 @@ export function EmptyState({ currentProject, projects, onStartChat }: EmptyState
         <button
           onClick={handleStart}
           disabled={isCustomMode ? !customPath.trim() : !currentDirectory}
-          className="w-full mt-6 px-4 py-2.5 bg-accent-main-100 hover:bg-accent-main-200 disabled:opacity-50 disabled:cursor-not-allowed text-oncolor-100 rounded-lg text-[length:var(--fs-base)] font-medium transition-colors"
+          className="w-full mt-6 px-4 py-2.5 text-oncolor-100 rounded-lg text-[length:var(--fs-base)] font-medium transition-all duration-150 disabled:opacity-50 disabled:cursor-not-allowed hover:brightness-110 active:scale-[0.99]"
+          style={{ background: 'var(--grad-brand)', boxShadow: 'var(--shadow-glow-brand)' }}
         >
           {t('emptyState.startConversation')}
         </button>
 
         {/* Hint */}
         <p className="mt-4 text-[length:var(--fs-sm)] text-text-500 text-center">{t('emptyState.orJustType')}</p>
+
+        {/* Quick-start templates — 一键打开模板画廊 */}
+        <div className="mt-6 pt-5 border-t border-border-200/40">
+          <div className="flex items-center justify-center gap-1.5 mb-2.5">
+            <SparklesIcon size={13} className="text-accent-main-100" />
+            <span className="text-[length:var(--fs-xs)] font-semibold uppercase tracking-wider text-text-400">
+              {t('emptyState.quickStart')}
+            </span>
+          </div>
+          <div className="flex flex-wrap justify-center gap-2">
+            {(['explain', 'fixBug', 'tests', 'review'] as const).map(id => (
+              <button
+                key={id}
+                type="button"
+                onClick={() => templateGalleryStore.open()}
+                className="px-2.5 py-1 rounded-full text-[length:var(--fs-sm)] text-text-300 bg-bg-200/50 border border-border-200/50 hover:border-accent-main-100/45 hover:text-text-100 hover:bg-bg-200 transition-colors"
+              >
+                {t(`templates.items.${id}.title`)}
+              </button>
+            ))}
+          </div>
+        </div>
       </div>
     </div>
   )

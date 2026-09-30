@@ -9,6 +9,7 @@ import {
   ChevronLeft,
   ChevronRight,
   SquarePen,
+  House,
   Hand,
   Keyboard,
   Check,
@@ -92,6 +93,7 @@ import {
   AppWindow,
   ZoomIn,
   ZoomOut,
+  Wrench,
 } from 'lucide-react'
 
 export interface IconProps extends SVGProps<SVGSVGElement> {
@@ -118,6 +120,7 @@ export const ChevronUpIcon = wrap(ChevronUp)
 export const ChevronLeftIcon = wrap(ChevronLeft)
 export const ChevronRightIcon = wrap(ChevronRight)
 export const NewChatIcon = wrap(SquarePen)
+export const HomeIcon = wrap(House)
 export const HandIcon = wrap(Hand)
 export const KeyboardIcon = wrap(Keyboard)
 export const CheckIcon = wrap(Check)
@@ -222,3 +225,5 @@ export const SplitHorizontalIcon = wrap(Columns2)
 export const SplitVerticalIcon = wrap(Rows2)
 export const GripVerticalIcon = wrap(GripVertical)
 export const AppWindowIcon = wrap(AppWindow)
+export const WrenchIcon = wrap(Wrench)
+export const SparklesIcon = wrap(Sparkles)

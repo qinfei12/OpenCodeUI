@@ -1245,3 +1245,571 @@ body {
     transition: none;
   }
 }
+
+/* ============================================
+ * UI Enhancement Tokens — 渐变 / 光晕 / 抬升
+ * ============================================
+ * 在现有语义色之上扩展，所有渐变都基于已注册的
+ * accent / info / success / warning 令牌，保证主题一致。
+ * 组件只引用 class 名，不写具体数值。
+ */
+
+:root {
+  /* 品牌渐变（用于 hero、active 指示、卡片图标背景） */
+  --grad-brand: linear-gradient(135deg, hsl(var(--accent-main-100)), hsl(var(--accent-main-200)));
+  --grad-brand-soft: linear-gradient(
+    135deg,
+    hsl(var(--accent-main-100) / 0.16),
+    hsl(var(--accent-secondary-100) / 0.12)
+  );
+  --grad-info: linear-gradient(135deg, hsl(var(--info-100)), hsl(var(--info-200)));
+  --grad-success: linear-gradient(135deg, hsl(var(--success-100)), hsl(var(--success-200)));
+  --grad-warning: linear-gradient(135deg, hsl(var(--warning-100)), hsl(var(--warning-200)));
+  --grad-danger: linear-gradient(135deg, hsl(var(--danger-100)), hsl(var(--danger-200)));
+
+  /* 抬升阴影 — 比 --shadow-lg 更有空气感 */
+  --shadow-elevate: 0 10px 30px -12px rgb(0 0 0 / 0.22), 0 4px 10px -4px rgb(0 0 0 / 0.1);
+  --shadow-glow-brand: 0 8px 28px -8px hsl(var(--accent-main-100) / 0.5);
+
+  /* 半径：超大卡片 */
+  --radius-3xl: 24px;
+}
+
+/* — 装饰性背景：柔光径向 + 细网格，用于 hero / 空状态 — */
+.bg-aurora {
+  background-color: hsl(var(--bg-100));
+  background-image:
+    radial-gradient(60% 50% at 50% 0%, hsl(var(--accent-main-100) / 0.12), transparent 70%),
+    radial-gradient(40% 40% at 85% 15%, hsl(var(--accent-secondary-100) / 0.1), transparent 70%),
+    radial-gradient(40% 40% at 15% 25%, hsl(var(--info-100) / 0.08), transparent 70%);
+}
+
+.bg-grid-faint {
+  background-image:
+    linear-gradient(hsl(var(--border-200) / 0.18) 1px, transparent 1px),
+    linear-gradient(90deg, hsl(var(--border-200) / 0.18) 1px, transparent 1px);
+  background-size: 28px 28px;
+  background-position: -1px -1px;
+}
+
+/* — 文字渐变（用于标题强调） — */
+.text-grad-brand {
+  background: var(--grad-brand);
+  -webkit-background-clip: text;
+  background-clip: text;
+  -webkit-text-fill-color: transparent;
+  color: transparent;
+}
+
+/* — 抬升卡片基类 — */
+.surface-elevate {
+  background-color: hsl(var(--bg-000));
+  border: 1px solid hsl(var(--border-200) / 0.6);
+  box-shadow: var(--shadow-elevate);
+}
+
+:root[data-glass] .surface-elevate {
+  background-color: hsl(var(--bg-000) / 0.82);
+  -webkit-backdrop-filter: blur(22px) saturate(200%);
+  backdrop-filter: blur(22px) saturate(200%);
+}
+
+/* — 模板/快捷卡片：悬停抬升 + 边框点亮 — */
+.tile-interactive {
+  transition:
+    transform 180ms cubic-bezier(0.22, 1, 0.36, 1),
+    border-color 180ms ease,
+    box-shadow 180ms ease;
+}
+
+.tile-interactive:hover {
+  transform: translateY(-2px);
+  border-color: hsl(var(--accent-main-100) / 0.45);
+  box-shadow: var(--shadow-elevate);
+}
+
+.tile-interactive:active {
+  transform: translateY(0) scale(0.99);
+}
+
+/* — 圆形渐变图标徽章（卡片角标） — */
+.badge-grad {
+  background: var(--grad-brand);
+  color: hsl(var(--oncolor-100));
+  box-shadow: 0 4px 12px -4px hsl(var(--accent-main-100) / 0.5);
+}
+
+/* — 入场动画：从下方淡入并轻微上移 — */
+@keyframes rise-in {
+  from {
+    opacity: 0;
+    transform: translateY(10px) scale(0.985);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
+}
+
+.animate-rise-in {
+  animation: rise-in 320ms cubic-bezier(0.22, 1, 0.36, 1) both;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .animate-rise-in {
+    animation: none;
+  }
+  .tile-interactive:hover {
+    transform: none;
+  }
+}
+
+/* ============================================
+ * Sidebar Enhancement — 侧边栏层次 / 导航 / Tab
+ * ============================================ */
+
+:root {
+  --grad-sidebar-edge: linear-gradient(
+    180deg,
+    hsl(var(--accent-main-100) / 0.28) 0%,
+    hsl(var(--accent-secondary-100) / 0.18) 30%,
+    hsl(var(--info-100) / 0.12) 60%,
+    transparent 100%
+  );
+}
+
+/* 侧边栏容器：柔光 + 右边界微光晕 */
+.sidebar-surface {
+  background-color: hsl(var(--bg-100));
+  background-image:
+    radial-gradient(65% 35% at 15% 0%, hsl(var(--accent-main-100) / 0.10), transparent 70%),
+    radial-gradient(45% 30% at 100% 100%, hsl(var(--accent-secondary-100) / 0.08), transparent 70%);
+}
+
+/* 侧边栏右侧彩色边条（非常淡，只在 light 模式下可见，避免暗模式过亮） */
+.sidebar-edge-accent {
+  background: var(--grad-sidebar-edge);
+  opacity: 0.85;
+  mix-blend-mode: screen;
+}
+
+@media (prefers-color-scheme: dark) {
+  .sidebar-edge-accent {
+    opacity: 0.45;
+    mix-blend-mode: normal;
+  }
+}
+
+/* 渐变文字 Logo（侧边栏顶部品牌名） */
+.sidebar-brand-title {
+  background: var(--grad-brand);
+  -webkit-background-clip: text;
+  background-clip: text;
+  -webkit-text-fill-color: transparent;
+  color: transparent;
+  letter-spacing: -0.01em;
+}
+
+/* New Chat / 主 CTA 按钮：渐变胶囊 + 光晕 */
+.btn-primary-grad {
+  background: var(--grad-brand);
+  color: hsl(var(--oncolor-100));
+  box-shadow:
+    0 6px 18px -6px hsl(var(--accent-main-100) / 0.45),
+    inset 0 1px 0 rgb(255 255 255 / 0.12);
+  transition:
+    box-shadow 150ms ease,
+    filter 150ms ease,
+    transform 120ms ease;
+}
+
+.btn-primary-grad:hover {
+  filter: brightness(1.08);
+  box-shadow:
+    0 10px 26px -8px hsl(var(--accent-main-100) / 0.55),
+    inset 0 1px 0 rgb(255 255 255 / 0.16);
+}
+
+.btn-primary-grad:active {
+  transform: scale(0.985);
+  filter: brightness(0.97);
+}
+
+/* Pill Tabs：带滑块指示器的 Tab Bar 容器 */
+.pill-tabs {
+  position: relative;
+  display: inline-flex;
+  padding: 2px;
+  border-radius: 10px;
+  background: hsl(var(--bg-200) / 0.55);
+  border: 1px solid hsl(var(--border-200) / 0.45);
+}
+
+.pill-tabs-indicator {
+  position: absolute;
+  top: 2px;
+  bottom: 2px;
+  border-radius: 8px;
+  background:
+    linear-gradient(
+      180deg,
+      hsl(var(--bg-000) / 0.95),
+      hsl(var(--bg-100) / 0.95)
+    );
+  box-shadow:
+    0 4px 14px -6px rgb(0 0 0 / 0.22),
+    inset 0 1px 0 hsl(var(--accent-main-100) / 0.18);
+  border: 1px solid hsl(var(--border-200) / 0.5);
+  transition:
+    transform 240ms cubic-bezier(0.22, 1, 0.36, 1),
+    width 240ms cubic-bezier(0.22, 1, 0.36, 1);
+}
+
+/* 搜索框：毛玻璃胶囊 */
+.search-glass {
+  background: hsl(var(--bg-200) / 0.55);
+  border: 1px solid hsl(var(--border-200) / 0.45);
+  border-radius: 10px;
+  box-shadow:
+    inset 0 1px 0 hsl(var(--bg-000) / 0.45),
+    inset 0 -1px 0 hsl(var(--border-200) / 0.25);
+  transition:
+    border-color 150ms ease,
+    box-shadow 150ms ease,
+    background-color 150ms ease;
+}
+
+.search-glass:focus-within {
+  border-color: hsl(var(--accent-main-100) / 0.48);
+  background: hsl(var(--bg-200) / 0.75);
+  box-shadow:
+    inset 0 1px 0 hsl(var(--bg-000) / 0.5),
+    0 0 0 3px hsl(var(--accent-main-100) / 0.12);
+}
+
+/* 会话列表项：选中状态渐变左边条（原只有 Settings 里用，现在 Sidebar 选中也用） */
+.session-item-active {
+  background: hsl(var(--bg-200) / 0.7);
+  position: relative;
+  isolation: isolate;
+}
+
+.session-item-active::before {
+  content: "";
+  position: absolute;
+  left: 0;
+  top: 6px;
+  bottom: 6px;
+  width: 3px;
+  border-radius: 0 3px 3px 0;
+  background: var(--grad-brand);
+  box-shadow: 0 0 8px -1px hsl(var(--accent-main-100) / 0.6);
+}
+
+/* ============================================
+ * Header / ChatArea Enhancement — 正文头部/聊天区
+ * ============================================ */
+
+/* 顶部分隔线：淡出型渐变分隔（替代原生 1px border） */
+.header-divider-grad::after {
+  content: "";
+  position: absolute;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  height: 1px;
+  background: linear-gradient(
+    90deg,
+    transparent 0%,
+    hsl(var(--border-200) / 0.5) 15%,
+    hsl(var(--border-200) / 0.75) 50%,
+    hsl(var(--border-200) / 0.5) 85%,
+    transparent 100%
+  );
+  pointer-events: none;
+}
+
+/* 聊天区背景：极淡柔光 + 细网格（只在容器无内容时显层次） */
+.chat-area-bg {
+  background-color: hsl(var(--bg-100));
+  background-image:
+    radial-gradient(55% 35% at 50% 0%, hsl(var(--accent-main-100) / 0.06), transparent 70%),
+    radial-gradient(40% 30% at 100% 20%, hsl(var(--accent-secondary-100) / 0.05), transparent 70%),
+    linear-gradient(hsl(var(--border-200) / 0.06) 1px, transparent 1px),
+    linear-gradient(90deg, hsl(var(--border-200) / 0.06) 1px, transparent 1px);
+  background-size: auto, auto, 32px 32px, 32px 32px;
+  background-position: 0 0, 0 0, 0 0, 0 0;
+}
+
+:root[data-glass] .chat-area-bg {
+  background-image:
+    radial-gradient(55% 35% at 50% 0%, hsl(var(--accent-main-100) / 0.08), transparent 70%),
+    radial-gradient(40% 30% at 100% 20%, hsl(var(--accent-secondary-100) / 0.06), transparent 70%),
+    linear-gradient(hsl(var(--border-200) / 0.04) 1px, transparent 1px),
+    linear-gradient(90deg, hsl(var(--border-200) / 0.04) 1px, transparent 1px);
+}
+
+/* 会话项时间标签胶囊 */
+.time-pill {
+  display: inline-flex;
+  align-items: center;
+  padding: 2px 8px;
+  border-radius: 999px;
+  font-size: var(--fs-xxs);
+  line-height: 1.3;
+  color: hsl(var(--text-400));
+  background: hsl(var(--bg-200) / 0.55);
+  border: 1px solid hsl(var(--border-200) / 0.4);
+  letter-spacing: 0.01em;
+}
+
+/* 右侧卡片（Context/Stats）柔和边 */
+.card-soft {
+  background: hsl(var(--bg-100));
+  border: 1px solid hsl(var(--border-200) / 0.55);
+  border-radius: 14px;
+  box-shadow:
+    0 6px 20px -12px rgb(0 0 0 / 0.18),
+    inset 0 1px 0 hsl(var(--bg-000) / 0.5);
+}
+
+:root[data-glass] .card-soft {
+  background: hsl(var(--bg-100) / 0.85);
+  -webkit-backdrop-filter: blur(18px) saturate(180%);
+  backdrop-filter: blur(18px) saturate(180%);
+}
+
+/* 工具栏按钮激活：小胶囊高亮 */
+.tool-btn-active {
+  background: linear-gradient(
+    180deg,
+    hsl(var(--accent-main-100) / 0.14),
+    hsl(var(--accent-main-200) / 0.08)
+  );
+  color: hsl(var(--accent-main-100));
+  border-color: hsl(var(--accent-main-100) / 0.35);
+  box-shadow: inset 0 1px 0 hsl(var(--accent-main-100) / 0.12);
+}
+
+/* ============================================
+   正文排版增强 — 聊天区画布 / 气泡 / 文本
+   ============================================ */
+
+/* 聊天区画布设：点阵网格 + 四角柔光晕，让背景不再是"死纯色" */
+.chat-canvas-vignette {
+  --dot: hsl(var(--accent-main-100) / 0.08);
+  background-color: hsl(var(--bg-100));
+  background-image:
+    radial-gradient(circle at 20% 0%, hsl(var(--accent-main-100) / 0.09), transparent 52%),
+    radial-gradient(circle at 95% 10%, hsl(var(--accent-secondary-100) / 0.08), transparent 50%),
+    radial-gradient(circle at 50% 100%, hsl(var(--accent-main-200) / 0.07), transparent 45%),
+    radial-gradient(circle at 2px 2px, var(--dot) 1.1px, transparent 1.4px);
+  background-size: auto, auto, auto, 22px 22px;
+  background-position: 0 0, 0 0, 0 0, 0 0;
+}
+
+:root[data-theme='dark'] .chat-canvas-vignette {
+  --dot: hsl(var(--accent-main-100) / 0.12);
+}
+
+/* 居中列：聊天内容宽度收窄到易读区间，像 Notion/ChatGPT */
+.chat-center-col {
+  width: 100%;
+  max-width: min(920px, 94%);
+  margin-inline: auto;
+  padding-inline: clamp(8px, 1.6vw, 16px);
+}
+
+@media (max-width: 640px) {
+  .chat-center-col {
+    max-width: 100%;
+    padding-inline: 10px;
+  }
+}
+
+/* 消息行之间更大的呼吸感（相邻两条消息的间距） */
+.chat-message-row + .chat-message-row {
+  margin-top: 20px;
+}
+
+@media (max-width: 640px) {
+  .chat-message-row + .chat-message-row {
+    margin-top: 14px;
+  }
+}
+
+/* 用户气泡：渐变主色 + 阴影 + 右下角小尾巴，一眼看出是"我的" */
+.bubble-user {
+  position: relative;
+  color: hsl(var(--oncolor-100));
+  background: linear-gradient(135deg, hsl(var(--accent-main-100)) 0%, hsl(var(--accent-main-200)) 100%);
+  border-radius: 18px 18px 6px 18px;
+  padding: 10px 16px !important;
+  box-shadow:
+    0 8px 22px -12px hsl(var(--accent-main-100) / 0.55),
+    0 3px 10px -6px hsl(var(--accent-main-100) / 0.35),
+    inset 0 1px 0 hsl(0 0% 100% / 0.18);
+  border: 1px solid hsl(var(--accent-main-200) / 0.35);
+  isolation: isolate;
+  max-width: 100%;
+}
+
+.bubble-user > .absolute.bottom-0 {
+  background-image: linear-gradient(
+    to top,
+    hsl(var(--accent-main-200)) 0%,
+    transparent 100%
+  ) !important;
+}
+
+/* 助手气泡：卡片化 — 柔和底色、左侧 accent 边条、阴影、内 padding */
+.bubble-assistant {
+  position: relative;
+  width: 100%;
+  padding: 16px 18px 14px 22px;
+  background: linear-gradient(180deg, hsl(var(--bg-000) / 0.82), hsl(var(--bg-100) / 0.9));
+  border: 1px solid hsl(var(--border-200) / 0.55);
+  border-radius: 20px;
+  box-shadow:
+    0 10px 28px -18px rgb(0 0 0 / 0.25),
+    0 4px 12px -10px rgb(0 0 0 / 0.18),
+    inset 0 1px 0 hsl(var(--bg-000) / 0.7);
+}
+
+.bubble-assistant::before {
+  content: '';
+  position: absolute;
+  left: 6px;
+  top: 14px;
+  bottom: 14px;
+  width: 3px;
+  border-radius: 999px;
+  background: linear-gradient(
+    180deg,
+    hsl(var(--accent-main-100)) 0%,
+    hsl(var(--accent-secondary-100)) 100%
+  );
+  opacity: 0.82;
+}
+
+:root[data-glass] .bubble-assistant {
+  background: linear-gradient(
+    180deg,
+    hsl(var(--bg-000) / 0.72),
+    hsl(var(--bg-100) / 0.78)
+  );
+  -webkit-backdrop-filter: blur(10px) saturate(150%);
+  backdrop-filter: blur(10px) saturate(150%);
+}
+
+@media (max-width: 640px) {
+  .bubble-assistant {
+    padding: 12px 14px 12px 16px;
+    border-radius: 16px;
+  }
+  .bubble-assistant::before {
+    left: 4px;
+    width: 2.5px;
+  }
+  .bubble-user {
+    padding: 8px 14px !important;
+  }
+}
+
+/* 文本排版：字距、行距放松，段落间距加大 — 用于正文/Markdown 外层 */
+.prose-relaxed,
+.prose-relaxed .rendered-markdown,
+.prose-relaxed [data-markdown-root],
+.prose-relaxed p,
+.prose-relaxed li,
+.prose-relaxed ul,
+.prose-relaxed ol,
+.prose-relaxed blockquote {
+  letter-spacing: 0.005em;
+  line-height: 1.78;
+}
+
+.prose-relaxed p {
+  margin-block: 0.78em;
+}
+
+.prose-relaxed p:first-child {
+  margin-top: 0.15em;
+}
+
+.prose-relaxed p:last-child {
+  margin-bottom: 0.15em;
+}
+
+.prose-relaxed h1,
+.prose-relaxed h2,
+.prose-relaxed h3,
+.prose-relaxed h4 {
+  margin-top: 1.4em;
+  margin-bottom: 0.55em;
+  letter-spacing: 0.004em;
+  line-height: 1.35;
+  font-weight: 650;
+}
+
+.prose-relaxed ul,
+.prose-relaxed ol {
+  margin-block: 0.8em;
+  padding-left: 1.45em;
+}
+
+.prose-relaxed li + li {
+  margin-top: 0.35em;
+}
+
+.prose-relaxed blockquote {
+  margin-block: 0.95em;
+  padding: 0.55em 1em;
+  border-left: 3px solid hsl(var(--accent-main-100) / 0.55);
+  background: hsl(var(--accent-main-100) / 0.05);
+  border-radius: 4px 10px 10px 4px;
+  color: hsl(var(--text-200) / 0.92);
+}
+
+.prose-relaxed code {
+  letter-spacing: 0;
+  font-size: 0.93em;
+  padding: 0.12em 0.4em;
+  border-radius: 6px;
+  background: hsl(var(--bg-200) / 0.75);
+  border: 1px solid hsl(var(--border-200) / 0.45);
+}
+
+.prose-relaxed pre {
+  margin-block: 1em;
+  border-radius: 12px;
+  overflow: hidden;
+  border: 1px solid hsl(var(--border-200) / 0.55);
+  box-shadow: 0 6px 18px -14px rgb(0 0 0 / 0.35);
+}
+
+.prose-relaxed pre code {
+  background: transparent;
+  border: 0;
+  padding: 0;
+  font-size: 0.9em;
+  line-height: 1.65;
+}
+
+.prose-relaxed hr {
+  margin-block: 1.4em;
+  border: 0;
+  height: 1px;
+  background: linear-gradient(
+    90deg,
+    transparent 0%,
+    hsl(var(--border-200) / 0.65) 30%,
+    hsl(var(--border-200) / 0.65) 70%,
+    transparent 100%
+  );
+}
+
+.prose-relaxed table {
+  margin-block: 1em;
+}
+

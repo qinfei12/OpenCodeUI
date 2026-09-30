@@ -1,10 +1,11 @@
 import { useState, useRef, useEffect, useCallback, useMemo } from 'react'
 import { useTranslation } from 'react-i18next'
-import { ChevronDownIcon, SendIcon, StopIcon, PaperclipIcon, AgentIcon, ThinkingIcon } from '../../../components/Icons'
+import { ChevronDownIcon, SendIcon, StopIcon, PaperclipIcon, AgentIcon, ThinkingIcon, SparklesIcon } from '../../../components/Icons'
 import { DropdownMenu, MenuItem, IconButton, AnimatedPresence } from '../../../components/ui'
 import { ModelSelector, type ModelSelectorHandle } from '../ModelSelector'
 import { useChatViewport } from '../chatViewport'
 import { isTauri, isTauriMobile, extToMime } from '../../../utils/tauri'
+import { templateGalleryStore } from '../../../store/templateGalleryStore'
 import type { ApiAgent } from '../../../api/client'
 import type { ModelInfo, FileCapabilities } from '../../../api'
 
@@ -26,6 +27,9 @@ interface InputToolbarProps {
 
   canSend: boolean
   onSend: () => void
+
+  // 模板画廊：选中后插入到输入框
+  onInsertText?: (text: string) => void
 
   // Model selection（移动端显示在工具栏）
   models?: ModelInfo[]
@@ -51,6 +55,7 @@ export function InputToolbar({
   onAbort,
   canSend,
   onSend,
+  onInsertText,
   models = [],
   selectedModelKey = null,
   onModelChange,
@@ -493,6 +498,14 @@ export function InputToolbar({
 
       {/* Action Buttons */}
       <div className="flex items-center gap-1">
+        <IconButton
+          aria-label={t('inputToolbar.templates')}
+          disabled={controlsDisabled}
+          onClick={() => templateGalleryStore.open(onInsertText)}
+          title={t('inputToolbar.templates')}
+        >
+          <SparklesIcon />
+        </IconButton>
         <AnimatedPresence show={supportsAnyFile}>
           <>
             {/* 浏览器模式下的隐藏文件输入 */}

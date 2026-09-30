@@ -548,6 +548,25 @@ function InputBoxComponent({
     text,
   ])
 
+  // 在光标处插入文本（用于模板画廊快速填充）
+  const insertText = useCallback(
+    (inserted: string) => {
+      if (!inserted) return
+      const textarea = textareaRef.current
+      const start = textarea?.selectionStart ?? text.length
+      const end = textarea?.selectionEnd ?? text.length
+      const next = text.slice(0, start) + inserted + text.slice(end)
+      setText(next)
+      requestAnimationFrame(() => {
+        if (!textareaRef.current) return
+        const pos = start + inserted.length
+        textareaRef.current.setSelectionRange(pos, pos)
+        textareaRef.current.focus()
+      })
+    },
+    [text],
+  )
+
   // 更新 @ 查询文本（用于进入/退出文件夹）
   const updateMentionQuery = useCallback(
     (newQuery: string) => {
@@ -1310,14 +1329,20 @@ function InputBoxComponent({
               onDragOver={handleDragOver}
               onDragLeave={handleDragLeave}
               onDrop={handleDrop}
-              className={`glass rounded-2xl relative overflow-hidden focus-within:outline-none shadow-lg ${
+              className={`glass rounded-2xl relative overflow-hidden focus-within:outline-none transition-[box-shadow,border-color] duration-200 ${
                 isDragging || isInternalFileDragging
                   ? 'border border-accent-main-100 ring-2 ring-accent-main-100/30'
                   : isStreaming
                     ? 'border border-accent-main-100/50 animate-border-pulse'
-                    : 'border border-border-200/60'
+                    : 'border border-border-200/60 hover:border-border-200/80'
               }`}
-              style={{ maxHeight: inputContainerMaxHeight }}
+              style={{
+                maxHeight: inputContainerMaxHeight,
+                boxShadow:
+                  isDragging || isInternalFileDragging
+                    ? undefined
+                    : '0 12px 32px -16px rgb(0 0 0 / 0.24), 0 4px 14px -8px rgb(0 0 0 / 0.12), inset 0 1px 0 hsl(var(--bg-000) / 0.35)',
+              }}
             >
               {/* Drop overlay */}
               {(isDragging || isInternalFileDragging) && (
@@ -1406,6 +1431,7 @@ function InputBoxComponent({
                       onAbort={onAbort}
                       canSend={canSend || false}
                       onSend={handleSend}
+                      onInsertText={insertText}
                       models={models}
                       selectedModelKey={selectedModelKey}
                       onModelChange={onModelChange}

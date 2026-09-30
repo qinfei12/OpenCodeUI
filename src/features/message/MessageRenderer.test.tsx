@@ -209,7 +209,7 @@ describe('MessageRenderer assistant fork', () => {
     const container = screen.getByTestId('user-markdown').parentElement!
     expect(container.style.maxHeight).toBe('')
     expect(container.style.contain).toBe('')
-    expect(screen.getByTestId('user-markdown').closest('.bg-bg-300')).toHaveClass('w-full', 'max-w-2xl')
+    expect(screen.getByTestId('user-markdown').closest('.bubble-user')).toHaveClass('w-full', 'max-w-2xl')
     expect(screen.getByTestId('user-markdown').closest('.group')).toHaveClass('w-full')
     expect(screen.getByTestId('user-markdown').closest('[data-user-html-artifact]')).toBeInTheDocument()
   })
@@ -219,7 +219,7 @@ describe('MessageRenderer assistant fork', () => {
     mockCollapseUserMessages = true
     render(<MessageRenderer message={createUserTextMessage('just some plain text')} />)
 
-    const container = screen.getByTestId('user-markdown').parentElement!
+    const container = screen.getByTestId('user-markdown').parentElement!.parentElement!
     expect(container.style.maxHeight).not.toBe('')
     expect(container.style.contain).toBe('layout paint')
   })
